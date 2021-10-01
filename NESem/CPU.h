@@ -1,11 +1,13 @@
 #pragma once
 #include <cstdint>
+
+class Bus;
 class CPU
 {
     struct INSTRUCTION {
         const char* name = "";
         void (CPU::* function)(void) = nullptr;
-        void (CPU::* mode)(void) = nullptr;
+        uint16_t (CPU::* mode)(void) = nullptr;
         uint8_t cycles = 0;
     };
 
@@ -44,9 +46,10 @@ private:
     void updateFlags(uint8_t val);
     bool getFlag(flag flag);
     void setBus(Bus* bus);
+    void addInstructions();
 
     //Adddressing modes
-    void IMP(), IMM(), ZP0(), ZPX(), ZPY(), ABS(), ABX(), ABY(), IND(), IZX(), IZY(), REL();
+    uint16_t IMP(), IMM(), ZP0(), ZPX(), ZPY(), ABS(), ABX(), ABY(), IND(), IZX(), IZY(), REL();
 
     //Load and Store instructions
     void LDA(), LDX(), LDY(), STA(), STX(), STY();
