@@ -33,6 +33,7 @@ private:
 
     Bus* bus;
     uint8_t address;
+    uint8_t op;
 
     uint8_t cycles;
     INSTRUCTION instructionTable[0xFF];
