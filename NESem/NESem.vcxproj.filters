@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Mappers">
       <UniqueIdentifier>{e8f1fb2d-a12d-4df6-bdb0-c16099ead5c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="roms">
+      <UniqueIdentifier>{fb99de98-744e-4ed4-8dfd-6bc51df7beed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,6 +39,12 @@
     <ClCompile Include="Mapper.cpp">
       <Filter>Source Files\Mappers</Filter>
     </ClCompile>
+    <ClCompile Include="Mapper000.cpp">
+      <Filter>Source Files\Mappers</Filter>
+    </ClCompile>
+    <ClCompile Include="Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPU.h">
@@ -50,5 +59,16 @@
     <ClInclude Include="Mapper.h">
       <Filter>Header Files\Mappers</Filter>
     </ClInclude>
+    <ClInclude Include="Mapper000.h">
+      <Filter>Header Files\Mappers</Filter>
+    </ClInclude>
+    <ClInclude Include="Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="roms\nestest.nes">
+      <Filter>roms</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,9 +1,12 @@
 #pragma once
 #include <../../Mapper.h>
 #include <cstdint>
+#include "Logger.h"
 
 class Cartridge
 {
+	Logger logger;
+
 	uint8_t PRGBankCount = 0;
 	uint8_t CHRBankCount = 0;
 

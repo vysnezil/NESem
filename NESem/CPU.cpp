@@ -1,6 +1,11 @@
 #include "CPU.h"
 #include "Bus.h"
 
+CPU::CPU()
+{
+    this->addInstructions();
+}
+
 void CPU::setBus(Bus* bus) {
 	this->bus = bus;
 }
@@ -24,12 +29,19 @@ void CPU::reset() {
 void CPU::clock() {
 	if (!cycles) {
         setFlag(U, 1);
+        logger.pc = pc;
 		uint8_t op = read(pc++);
 		cycles = instructionTable[op].cycles;
 		address = (this->*instructionTable[op].mode)();
 		(this->*instructionTable[op].function)();
+        logger.logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status);
 	}
 	cycles--;
+}
+
+void CPU::jump(uint16_t address)
+{
+    pc = address;
 }
 
 void CPU::setFlag(flag flag, bool value) {
@@ -73,7 +85,7 @@ uint16_t CPU::ZPY()
 
 uint16_t CPU::ABS()
 {
-    return (read(pc++) << 8) | read(pc++);
+    return  read(pc++) | (read(pc++) << 8);
 }
 
 uint16_t CPU::ABX()
@@ -118,7 +130,11 @@ uint16_t CPU::IZY()
 
 uint16_t CPU::REL()
 {
-    return pc + (int8_t)read(pc++);
+    //return pc + (int8_t)read(pc++);
+    uint16_t addr = read(pc);
+    pc++;
+    if (addr & 0x80) addr |= 0xFF00;
+    return addr;
 }
 
 void CPU::LDA()

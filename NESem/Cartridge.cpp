@@ -1,5 +1,6 @@
 #include "Cartridge.h"
 #include <fstream>
+#include "Mapper000.h"
 
 Cartridge::Cartridge(const char* path)
 {
@@ -37,21 +38,41 @@ Cartridge::Cartridge(const char* path)
 			//iNES format
 			PRGBankCount = header.prg_chunks;
 			PRGMemory = new uint8_t[16384 * PRGBankCount];
-			file.read((char*)PRGMemory, sizeof(PRGMemory));
+			file.read((char*)PRGMemory, 16384 * PRGBankCount);
 
 			CHRBankCount = header.chr_chunks;
 			CHRMemory = new uint8_t[8192 * CHRBankCount];
-			file.read((char*)CHRMemory, sizeof(CHRMemory));
+			file.read((char*)CHRMemory, sizeof(8192 * CHRBankCount));
 		}
 
 		switch (mapperID)
 		{
 		case 0:
-			//create mapper 0
+			mapper = new Mapper000(PRGBankCount, CHRBankCount);
 			break;
 		}
 
 		file.close();
 	}
-	//else handle arror
+	else logger.log("CARTRIDGE: file opening error");
+}
+
+uint8_t Cartridge::cpuRead(uint16_t addr)
+{
+	return PRGMemory[mapper->cpuMapRead(addr)];
+}
+
+void Cartridge::cpuWrite(uint16_t addr, uint8_t data)
+{
+	PRGMemory[mapper->cpuMapWrite(addr)] = data;
+}
+
+uint8_t Cartridge::ppuRead(uint16_t addr)
+{
+	return CHRMemory[mapper->ppuMapRead(addr)];
+}
+
+void Cartridge::ppuWrite(uint16_t addr, uint8_t data)
+{
+	CHRMemory[mapper->ppuMapWrite(addr)] = data;
 }

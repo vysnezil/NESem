@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "Logger.h"
 
 class Bus;
 class CPU
@@ -26,13 +27,19 @@ public:
 	void clock();
 	void reset();
 
+    void setBus(Bus* bus);
+    CPU();
+
+    //DEBUG
+    void jump(uint16_t address);
+
 private:
     //Internal registers
     uint8_t x, y, a, sp, status;
     uint16_t pc;
 
     Bus* bus;
-    uint8_t address;
+    uint16_t address;
     uint8_t op;
 
     uint8_t cycles;
@@ -46,8 +53,10 @@ private:
     void setFlag(flag flag, bool value);
     void updateFlags(uint8_t val);
     bool getFlag(flag flag);
-    void setBus(Bus* bus);
     void addInstructions();
+
+    //Logger
+    Logger logger;
 
     //Adddressing modes
     uint16_t IMP(), IMM(), ZP0(), ZPX(), ZPY(), ABS(), ABX(), ABY(), IND(), IZX(), IZY(), REL();
