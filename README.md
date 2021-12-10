@@ -1,5 +1,5 @@
 # NESem
-NES emulator writenn in c++ for sočka
+NES emulator written in c++ for sočka
 
 ![preview](https://github.com/vysnezil/NESem/blob/master/imgs/demo.png)
 
