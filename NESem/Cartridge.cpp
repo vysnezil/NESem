@@ -19,6 +19,7 @@ Cartridge::Cartridge(const char* path)
 
 	std::ifstream file;
 	file.open(path, std::ifstream::binary);
+	file.seekg(0, std::ios::beg);
 	if (file.is_open())
 	{
 		file.read((char*)&header, sizeof(header));
@@ -38,11 +39,12 @@ Cartridge::Cartridge(const char* path)
 			//iNES format
 			PRGBankCount = header.prg_chunks;
 			PRGMemory = new uint8_t[16384 * PRGBankCount];
-			file.read((char*)PRGMemory, 16384 * PRGBankCount);
+			file.read((char*)PRGMemory, (16384 * PRGBankCount));
 
 			CHRBankCount = header.chr_chunks;
 			CHRMemory = new uint8_t[8192 * CHRBankCount];
-			file.read((char*)CHRMemory, sizeof(8192 * CHRBankCount));
+			file.read((char*)CHRMemory, (8192 * CHRBankCount));
+
 		}
 
 		switch (mapperID)
@@ -54,7 +56,7 @@ Cartridge::Cartridge(const char* path)
 
 		file.close();
 	}
-	else logger.log("CARTRIDGE: file opening error");
+	else Logger::log("CARTRIDGE: file opening error");
 }
 
 uint8_t Cartridge::cpuRead(uint16_t addr)
@@ -62,9 +64,16 @@ uint8_t Cartridge::cpuRead(uint16_t addr)
 	return PRGMemory[mapper->cpuMapRead(addr)];
 }
 
-void Cartridge::cpuWrite(uint16_t addr, uint8_t data)
+bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
 {
 	PRGMemory[mapper->cpuMapWrite(addr)] = data;
+	if (mapper->cpuMapWrite(addr))
+	{
+		PRGMemory[mapper->cpuMapWrite(addr)] = data;
+		return true;
+	}
+	else
+		return false;
 }
 
 uint8_t Cartridge::ppuRead(uint16_t addr)
@@ -72,7 +81,14 @@ uint8_t Cartridge::ppuRead(uint16_t addr)
 	return CHRMemory[mapper->ppuMapRead(addr)];
 }
 
-void Cartridge::ppuWrite(uint16_t addr, uint8_t data)
+bool Cartridge::ppuWrite(uint16_t addr, uint8_t data)
 {
 	CHRMemory[mapper->ppuMapWrite(addr)] = data;
+	if (mapper->ppuMapWrite(addr))
+	{
+		CHRMemory[mapper->ppuMapWrite(addr)] = data;
+		return true;
+	}
+	else
+		return false;
 }

@@ -78,6 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>X:\Visual Studio\glfw-3.3.4\include;$(IncludePath)</IncludePath>
+    <LibraryPath>X:\Visual Studio\glfw-3.3.4\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -116,10 +118,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,21 +143,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Prijekt\new\pixelRendering\pixelRendering\glad.c">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="Bus.cpp" />
     <ClCompile Include="Cartridge.cpp" />
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="CPU.cpp" />
+    <ClCompile Include="Display.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mapper.cpp" />
     <ClCompile Include="Mapper000.cpp" />
+    <ClCompile Include="PPU.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bus.h" />
     <ClInclude Include="Cartridge.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="CPU.h" />
+    <ClInclude Include="Display.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Mapper.h" />
     <ClInclude Include="Mapper000.h" />
+    <ClInclude Include="PPU.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="roms\nestest.nes" />

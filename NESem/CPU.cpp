@@ -20,23 +20,30 @@ uint8_t CPU::read(uint16_t address) {
 }
 
 void CPU::reset() {
-	x = y = a = sp = status = 0;
+	x = y = a = sp = status = address = 0;
 	setFlag(U, 1);
-	sp = 0x00FF;
+	sp = 0x00FD;
 	pc = read(0xFFFC) | (read(0xFFFD) << 8);
 }
 
 void CPU::clock() {
 	if (!cycles) {
         setFlag(U, 1);
-        logger.pc = pc;
-		uint8_t op = read(pc++);
+        uint16_t pc_tmp = pc;
+		op = read(pc++);
 		cycles = instructionTable[op].cycles;
 		address = (this->*instructionTable[op].mode)();
+        Logger::logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status, pc_tmp);
 		(this->*instructionTable[op].function)();
-        logger.logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status);
+        
 	}
 	cycles--;
+}
+
+uint16_t CPU::getAddress() {
+    if (!((instructionTable[op].mode == &CPU::IMP)))
+        return read(address);
+    else return address & 0x00FF;
 }
 
 void CPU::jump(uint16_t address)
@@ -56,6 +63,22 @@ void CPU::updateFlags(uint8_t val) {
 
 bool CPU::getFlag(flag flag) {
 	return status & flag;
+}
+
+void CPU::NMI()
+{
+    write(0x0100 + sp--, (pc >> 8) & 0x00FF);
+    write(0x0100 + sp--, pc & 0x00FF);
+
+    setFlag(B, 0);
+    setFlag(U, 1);
+    setFlag(I, 1);
+    write(0x0100 + sp--, status);
+
+    address = 0xFFFA;
+    pc = (read(0xFFFB) << 8) | read(0xFFFA);
+
+    cycles = 8;
 }
 
 uint16_t CPU::IMP()
@@ -108,10 +131,18 @@ uint16_t CPU::ABY()
 
 uint16_t CPU::IND()
 {
-    uint16_t ptr = (read(pc++) << 8) | read(pc++);
+    /*uint16_t ptr = (read(pc++) << 8) | read(pc++);
     //page boundary hardware bug
     if ((ptr & 0x00FF) == 0x00FF) return (read(ptr & 0xFF00) << 8) | read(ptr);
-    else return (read(ptr + 1) << 8) | read(ptr);
+    else return (read(ptr + 1) << 8) | read(ptr);*/
+
+    uint16_t ptr_lo = read(pc++);
+    uint16_t ptr_hi = read(pc++);
+
+    uint16_t ptr = (ptr_hi << 8) | ptr_lo;
+
+    if (ptr_lo == 0x00FF) return (read(ptr & 0xFF00) << 8) | read(ptr + 0);
+    return (read(ptr + 1) << 8) | read(ptr + 0);
 }
 
 uint16_t CPU::IZX()
@@ -139,25 +170,25 @@ uint16_t CPU::REL()
 
 void CPU::LDA()
 {
-    a = read(address);
+    a = getAddress();
     updateFlags(a);
 }
 
 void CPU::LDX()
 {
-    x = read(address);
+    x = getAddress();
     updateFlags(x);
 }
 
 void CPU::LDY()
 {
-    y = read(address);
+    y = getAddress();
     updateFlags(y);
 }
 
 void CPU::XXX()
 {
-    //TODO: logger, remove this instrunction
+    //TODO: remove this instrunction
 }
 
 void CPU::JMP()
@@ -222,12 +253,13 @@ void CPU::RTI()
 
 void CPU::ADC()
 {
-    uint16_t temp = (uint16_t)a + (uint16_t)read(address) + (uint16_t)getFlag(C);
+    address = getAddress();
+    uint16_t temp = (uint16_t)a + (uint16_t)(address) + (uint16_t)getFlag(C);
     setFlag(C, temp > 255);
     setFlag(Z, (temp & 0x00FF) == 0);
 
     //
-    setFlag(V, (~((uint16_t)a ^ (uint16_t)read(address)) & ((uint16_t)a ^ (uint16_t)temp)) & 0x0080);
+    setFlag(V, (~((uint16_t)a ^ (uint16_t)(address)) & ((uint16_t)a ^ (uint16_t)temp)) & 0x0080);
 
     setFlag(N, temp & 0x80);
     a = temp & 0x00FF;
@@ -235,7 +267,7 @@ void CPU::ADC()
 
 void CPU::SBC()
 {
-    uint16_t value = ((uint16_t)read(address)) ^ 0x00FF;
+    uint16_t value = ((uint16_t)getAddress()) ^ 0x00FF;
     uint16_t temp = (uint16_t)a + value + (uint16_t)getFlag(C);
     setFlag(C, temp & 0xFF00);
     setFlag(Z, (temp & 0x00FF) == 0);
@@ -329,16 +361,16 @@ void CPU::BVS()
 
 void CPU::CPX()
 {
-    uint16_t temp = (uint16_t)x - (uint16_t)read(address);
-    setFlag(C, x >= read(address));
+    uint16_t temp = (uint16_t)x - (uint16_t)getAddress();
+    setFlag(C, x >= getAddress());
     setFlag(Z, (temp & 0x00FF) == 0x0000);
     setFlag(N, temp & 0x0080);
 }
 
 void CPU::CPY()
 {
-    uint16_t temp = (uint16_t)y - (uint16_t)read(address);
-    setFlag(C, y >= read(address));
+    uint16_t temp = (uint16_t)y - (uint16_t)getAddress();
+    setFlag(C, y >= getAddress());
     setFlag(Z, (temp & 0x00FF) == 0x0000);
     setFlag(N, temp & 0x0080);
 }
@@ -468,21 +500,21 @@ void CPU::ROR()
 
 void CPU::AND()
 {
-    a &= read(address);
+    a &= getAddress();
     updateFlags(a);
     cycles++;
 }
 
 void CPU::ORA()
 {
-    a |= read(address);
+    a |= getAddress();
     updateFlags(a);
     cycles++;
 }
 
 void CPU::EOR()
 {
-    a ^= read(address);
+    a ^= getAddress();
     updateFlags(a);
     cycles++;
 }
@@ -534,8 +566,8 @@ void CPU::CLV()
 
 void CPU::CMP()
 {
-    uint16_t tmp = (uint16_t)a - (uint16_t)read(address);
-    setFlag(C, a >= read(address));
+    uint16_t tmp = (uint16_t)a - (uint16_t)getAddress();
+    setFlag(C, a >= getAddress());
     updateFlags(tmp);
     cycles++;
 }
@@ -724,4 +756,32 @@ void CPU::addInstructions()
     addInstruction(0x84, "STY", STY, ZP0, 3);
     addInstruction(0x94, "STY", STY, ZPY, 4);
     addInstruction(0x8C, "STY", STY, ABS, 4);
+
+    addInstruction(0x1A, "NOP*", NOP, IMP, 2);
+    addInstruction(0x3A, "NOP*", NOP, IMP, 2);
+    addInstruction(0x5A, "NOP*", NOP, IMP, 2);
+    addInstruction(0x7A, "NOP*", NOP, IMP, 2);
+    addInstruction(0xDA, "NOP*", NOP, IMP, 2);
+    addInstruction(0xFA, "NOP*", NOP, IMP, 2);
+    addInstruction(0x80, "NOP*", NOP, IMM, 2);
+    addInstruction(0x82, "NOP*", NOP, IMM, 2);
+    addInstruction(0x89, "NOP*", NOP, IMM, 2);
+    addInstruction(0xC2, "NOP*", NOP, IMM, 2);
+    addInstruction(0xE2, "NOP*", NOP, IMM, 2);
+    addInstruction(0x04, "NOP*", NOP, ZP0, 3);
+    addInstruction(0x44, "NOP*", NOP, ZP0, 3);
+    addInstruction(0x64, "NOP*", NOP, ZP0, 3);
+    addInstruction(0x14, "NOP*", NOP, ZPX, 4);
+    addInstruction(0x34, "NOP*", NOP, ZPX, 4);
+    addInstruction(0x54, "NOP*", NOP, ZPX, 4);
+    addInstruction(0x74, "NOP*", NOP, ZPX, 4);
+    addInstruction(0xD4, "NOP*", NOP, ZPX, 4);
+    addInstruction(0xF4, "NOP*", NOP, ZPX, 4);
+    addInstruction(0x0C, "NOP*", NOP, ABS, 4);
+    addInstruction(0x1C, "NOP*", NOP, ABX, 4);
+    addInstruction(0x3C, "NOP*", NOP, ABX, 4);
+    addInstruction(0x5C, "NOP*", NOP, ABX, 4);
+    addInstruction(0x7C, "NOP*", NOP, ABX, 4);
+    addInstruction(0xDC, "NOP*", NOP, ABX, 4);
+    addInstruction(0xFC, "NOP*", NOP, ABX, 4);
 }

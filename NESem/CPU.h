@@ -29,7 +29,7 @@ public:
 
     void setBus(Bus* bus);
     CPU();
-
+    void NMI();
     //DEBUG
     void jump(uint16_t address);
 
@@ -54,9 +54,8 @@ private:
     void updateFlags(uint8_t val);
     bool getFlag(flag flag);
     void addInstructions();
-
-    //Logger
-    Logger logger;
+    uint16_t getAddress();
+    
 
     //Adddressing modes
     uint16_t IMP(), IMM(), ZP0(), ZPX(), ZPY(), ABS(), ABX(), ABY(), IND(), IZX(), IZY(), REL();

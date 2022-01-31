@@ -9,10 +9,10 @@ unsigned int texture, VAO;
 
 Display::Display()
 {
-	if (!glfwInit()) log("Failed to initialize GLFW!");
+	if (!glfwInit()) Logger::log("Failed to initialize GLFW!");
 	window = glfwCreateWindow(800, 600, "window", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) log("Failed to initialize GLAD!");
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::log("Failed to initialize GLAD!");
     //glfwSetErrorCallback(error_callback);
 
     texture = setupTexture();
@@ -22,7 +22,7 @@ Display::Display()
 }
 
 void Display::error_callback(int error, const char* description) {
-    log(std::string("OpenGL Error: ") + std::string(description));
+    Logger::log(std::string("OpenGL Error: ") + std::string(description));
 }
 
 bool Display::shouldClose() {
@@ -43,10 +43,12 @@ void Display::update(uint8_t* displayData1) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
-    glfwPollEvents();
 }
 
-
+void Display::updateEvents()
+{
+    glfwPollEvents();
+}
 
 GLuint Display::createShader() {
     const char* fragment_shader =

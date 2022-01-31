@@ -8,6 +8,7 @@ public:
 	Display();
 	bool shouldClose();
 	void update(uint8_t* displayData);
+	void updateEvents();
 
 private:
 	void error_callback(int error, const char* description);

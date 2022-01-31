@@ -5,8 +5,6 @@
 
 class Cartridge
 {
-	Logger logger;
-
 	uint8_t PRGBankCount = 0;
 	uint8_t CHRBankCount = 0;
 
@@ -15,6 +13,7 @@ class Cartridge
 
 	Mapper* mapper = nullptr;
 
+public:
 	enum MIRROR
 	{
 		HORIZONTAL,
@@ -23,12 +22,11 @@ class Cartridge
 		ONESCREEN_HI,
 	} mirror = HORIZONTAL;
 
-public:
 	Cartridge(const char* path);
 	uint8_t cpuRead(uint16_t addr);
-	void cpuWrite(uint16_t addr, uint8_t data);
+	bool cpuWrite(uint16_t addr, uint8_t data);
 
 	uint8_t ppuRead(uint16_t addr);
-	void ppuWrite(uint16_t addr, uint8_t data);
+	bool ppuWrite(uint16_t addr, uint8_t data);
 };
 

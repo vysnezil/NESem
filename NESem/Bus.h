@@ -1,12 +1,14 @@
 #pragma once
 #include <cstdint>
 #include "CPU.h"
+#include "PPU.h"
 #include "Cartridge.h"
 
 class Bus
 {
 public:
 	CPU cpu;
+	PPU ppu;
 	Cartridge* cart = nullptr;
 	uint8_t ram[2048];
 

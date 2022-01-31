@@ -8,6 +8,7 @@ uint32_t Mapper000::cpuMapRead(uint16_t addr)
 	{
 		return addr & (PRGBankCount > 1 ? 0x7FFF : 0x3FFF);
 	}
+	return 0;
 }
 
 uint32_t Mapper000::cpuMapWrite(uint16_t addr)
@@ -16,6 +17,7 @@ uint32_t Mapper000::cpuMapWrite(uint16_t addr)
 	{
 		return addr & (PRGBankCount > 1 ? 0x7FFF : 0x3FFF);
 	}
+	return 0;
 }
 
 uint32_t Mapper000::ppuMapRead(uint16_t addr)
@@ -24,6 +26,7 @@ uint32_t Mapper000::ppuMapRead(uint16_t addr)
 	{
 		return addr;
 	}
+	return 0;
 }
 
 uint32_t Mapper000::ppuMapWrite(uint16_t addr)
@@ -32,4 +35,5 @@ uint32_t Mapper000::ppuMapWrite(uint16_t addr)
 	{
 		return addr;
 	}
+	return 0;
 }
