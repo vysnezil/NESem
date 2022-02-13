@@ -22,7 +22,7 @@ uint8_t CPU::read(uint16_t address) {
 void CPU::reset() {
 	x = y = a = sp = status = address = 0;
 	setFlag(U, 1);
-	sp = 0x00FD;
+	sp = 0x00FF;
 	pc = read(0xFFFC) | (read(0xFFFD) << 8);
 }
 
@@ -33,7 +33,7 @@ void CPU::clock() {
 		op = read(pc++);
 		cycles = instructionTable[op].cycles;
 		address = (this->*instructionTable[op].mode)();
-        Logger::logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status, pc_tmp);
+        //Logger::logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status, pc_tmp);
 		(this->*instructionTable[op].function)();
         
 	}
@@ -41,9 +41,9 @@ void CPU::clock() {
 }
 
 uint16_t CPU::getAddress() {
-    if (!((instructionTable[op].mode == &CPU::IMP)))
-        return read(address);
-    else return address & 0x00FF;
+    if (((instructionTable[op].mode == &CPU::IMP)))
+        return address & 0x00FF;
+    else return read(address);
 }
 
 void CPU::jump(uint16_t address)
@@ -108,7 +108,7 @@ uint16_t CPU::ZPY()
 
 uint16_t CPU::ABS()
 {
-    return  read(pc++) | (read(pc++) << 8);
+    return read(pc++) | (read(pc++) << 8);
 }
 
 uint16_t CPU::ABX()
@@ -141,8 +141,14 @@ uint16_t CPU::IND()
 
     uint16_t ptr = (ptr_hi << 8) | ptr_lo;
 
-    if (ptr_lo == 0x00FF) return (read(ptr & 0xFF00) << 8) | read(ptr + 0);
-    return (read(ptr + 1) << 8) | read(ptr + 0);
+    if (ptr_lo == 0x00FF)
+    {
+        return (read(ptr & 0xFF00) << 8) | read(ptr + 0);
+    }
+    else
+    {
+        return (read(ptr + 1) << 8) | read(ptr + 0);
+    }
 }
 
 uint16_t CPU::IZX()
@@ -267,13 +273,14 @@ void CPU::ADC()
 
 void CPU::SBC()
 {
-    uint16_t value = ((uint16_t)getAddress()) ^ 0x00FF;
+    uint16_t value = getAddress() ^ 0x00FF;
     uint16_t temp = (uint16_t)a + value + (uint16_t)getFlag(C);
     setFlag(C, temp & 0xFF00);
     setFlag(Z, (temp & 0x00FF) == 0);
     setFlag(V, (temp ^ (uint16_t)a) & (temp ^ value) & 0x0080);
     setFlag(N, temp & 0x0080);
     a = temp & 0x00FF;
+    cycles++;
 }
 
 void CPU::SEC()
@@ -411,6 +418,8 @@ void CPU::PHP()
 {
     write(sp + 0x100, status);
     sp--;
+    setFlag(B, 0);
+    setFlag(U, 0);
 }
 
 void CPU::PLP()
@@ -456,7 +465,7 @@ void CPU::TXS()
 
 void CPU::ASL()
 {
-    uint16_t temp = (uint16_t)read(address) << 1;
+    uint16_t temp = (uint16_t)getAddress() << 1;
     setFlag(C, (temp & 0xFF00) > 0);
     updateFlags(temp);
     if (instructionTable[op].mode == &CPU::IMP)
@@ -467,8 +476,9 @@ void CPU::ASL()
 
 void CPU::LSR()
 {
-    setFlag(C, (uint16_t)(read(address) & 0xFF00) > 0);
-    uint16_t temp = (uint16_t)read(address) >> 1;
+    uint8_t temp = (uint8_t)getAddress();
+    setFlag(C, temp & 0x0001);
+    temp >>= 1;
     updateFlags(temp);
     if (instructionTable[op].mode == &CPU::IMP)
         a = temp & 0x00FF;
@@ -478,7 +488,7 @@ void CPU::LSR()
 
 void CPU::ROL()
 {
-    uint8_t temp = (uint16_t)(read(address) << 1) | (uint16_t)getFlag(C);
+    uint16_t temp = (getAddress() << 1) | getFlag(C);
     setFlag(C, temp & 0xFF00);
     updateFlags(temp);
     if (instructionTable[op].mode == &CPU::IMP)
@@ -489,8 +499,8 @@ void CPU::ROL()
 
 void CPU::ROR()
 {
-    uint8_t temp = (uint16_t)(getFlag(C) << 7) | (read(address) >> 1);
-    setFlag(C, read(address) & 0x01);
+    uint16_t temp = (uint16_t)(getFlag(C) << 7) | (getAddress() >> 1);
+    setFlag(C, getAddress() & 0x01);
     updateFlags(temp);
     if (instructionTable[op].mode == &CPU::IMP)
         a = temp & 0x00FF;
@@ -601,7 +611,7 @@ void CPU::addInstructions()
     addInstruction(0x6C, "JMP", JMP, IND, 5);
 
     addInstruction(0xEA, "NOP", NOP, IMP, 2);
-    addInstruction(0x01, "BRK", BRK, IMP, 7);
+    addInstruction(0x00, "BRK", BRK, IMP, 7);
 
     addInstruction(0x24, "BIT", BIT, ZP0, 3);
     addInstruction(0x2C, "BIT", BIT, ABS, 4);

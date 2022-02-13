@@ -1,5 +1,4 @@
 #include "Cartridge.h"
-#include <fstream>
 #include "Mapper000.h"
 
 Cartridge::Cartridge(const char* path)
@@ -27,7 +26,7 @@ Cartridge::Cartridge(const char* path)
 		//for now, lets assume that this file is valid nes format
 		//if (header.name != "NES") std::cerr << "\nInvalid NES file!";
 
-		if (header.flags1 & 1 << 2) file.seekg(512, std::ios_base::cur);
+		if (header.flags1 & 0x04) file.seekg(512, std::ios_base::cur);
 		uint8_t mapperID = (header.flags2 | (header.flags1 >> 4));
 		mirror = (header.flags1 & 0x01) ? VERTICAL : HORIZONTAL;
 
@@ -39,11 +38,15 @@ Cartridge::Cartridge(const char* path)
 			//iNES format
 			PRGBankCount = header.prg_chunks;
 			PRGMemory = new uint8_t[16384 * PRGBankCount];
-			file.read((char*)PRGMemory, (16384 * PRGBankCount));
+			file.read((char*)PRGMemory, (static_cast<std::streamsize>(16384) * PRGBankCount));
 
 			CHRBankCount = header.chr_chunks;
 			CHRMemory = new uint8_t[8192 * CHRBankCount];
-			file.read((char*)CHRMemory, (8192 * CHRBankCount));
+			if (CHRBankCount == 0)
+			{
+				CHRMemory = new uint8_t[8192 * CHRBankCount];
+			}
+			file.read((char*)CHRMemory, (static_cast<std::streamsize>(8192) * CHRBankCount));
 
 		}
 
@@ -59,34 +62,49 @@ Cartridge::Cartridge(const char* path)
 	else Logger::log("CARTRIDGE: file opening error");
 }
 
-uint8_t Cartridge::cpuRead(uint16_t addr)
+bool Cartridge::cpuRead(uint16_t addr, uint8_t& data)
 {
-	return PRGMemory[mapper->cpuMapRead(addr)];
-}
-
-bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
-{
-	PRGMemory[mapper->cpuMapWrite(addr)] = data;
-	if (mapper->cpuMapWrite(addr))
+	uint32_t mapped_addr = 0;
+	if (mapper->cpuMapRead(addr, mapped_addr))
 	{
-		PRGMemory[mapper->cpuMapWrite(addr)] = data;
+		data = PRGMemory[mapped_addr];
 		return true;
 	}
 	else
 		return false;
 }
 
-uint8_t Cartridge::ppuRead(uint16_t addr)
+bool Cartridge::cpuWrite(uint16_t addr, uint8_t data)
 {
-	return CHRMemory[mapper->ppuMapRead(addr)];
+	uint32_t mapped_addr = 0;
+	if (mapper->cpuMapWrite(addr, mapped_addr))
+	{
+		PRGMemory[mapped_addr] = data;
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Cartridge::ppuRead(uint16_t addr, uint8_t& data)
+{
+	uint32_t mapped_addr = 0;
+
+	if (mapper->ppuMapRead(addr, mapped_addr))
+	{
+		data = CHRMemory[mapped_addr];
+		return true;
+	}
+	else
+		return false;
 }
 
 bool Cartridge::ppuWrite(uint16_t addr, uint8_t data)
 {
-	CHRMemory[mapper->ppuMapWrite(addr)] = data;
-	if (mapper->ppuMapWrite(addr))
+	uint32_t mapped_addr = 0;
+	if (mapper->ppuMapWrite(addr, mapped_addr))
 	{
-		CHRMemory[mapper->ppuMapWrite(addr)] = data;
+		CHRMemory[mapped_addr] = data;
 		return true;
 	}
 	else

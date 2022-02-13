@@ -7,8 +7,8 @@ public:
 	Mapper000(uint8_t prgBanks, uint8_t chrBanks);
 
 public:
-	uint32_t cpuMapRead(uint16_t addr) override;
-	uint32_t cpuMapWrite(uint16_t addr) override;
-	uint32_t ppuMapRead(uint16_t addr) override;
-	uint32_t ppuMapWrite(uint16_t addr) override;
+	bool cpuMapRead(uint16_t addr, uint32_t& mapped_addr) override;
+	bool cpuMapWrite(uint16_t addr, uint32_t& mapped_addr) override;
+	bool ppuMapRead(uint16_t addr, uint32_t& mapped_addr) override;
+	bool ppuMapWrite(uint16_t addr, uint32_t& mapped_addr) override;
 };

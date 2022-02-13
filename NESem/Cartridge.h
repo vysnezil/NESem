@@ -23,10 +23,10 @@ public:
 	} mirror = HORIZONTAL;
 
 	Cartridge(const char* path);
-	uint8_t cpuRead(uint16_t addr);
+	bool cpuRead(uint16_t addr, uint8_t& data);
 	bool cpuWrite(uint16_t addr, uint8_t data);
 
-	uint8_t ppuRead(uint16_t addr);
+	bool ppuRead(uint16_t addr, uint8_t & data);
 	bool ppuWrite(uint16_t addr, uint8_t data);
 };
 

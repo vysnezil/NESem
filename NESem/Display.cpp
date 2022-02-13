@@ -2,7 +2,6 @@
 #include "Logger.h"
 #include <string>
 
-GLFWwindow* window;
 uint8_t* displayData;
 GLuint shader;
 unsigned int texture, VAO;
@@ -13,7 +12,7 @@ Display::Display()
 	window = glfwCreateWindow(800, 600, "window", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::log("Failed to initialize GLAD!");
-    //glfwSetErrorCallback(error_callback);
+    glfwSetErrorCallback(this->error_callback);
 
     texture = setupTexture();
     VAO = setupBuffers();

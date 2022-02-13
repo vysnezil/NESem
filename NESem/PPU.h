@@ -26,6 +26,8 @@ public:
 
 	uint8_t* dat = new uint8_t[256 * 240 * 3];
 
+	uint16_t frames = 0;
+
 private:
 
 	uint8_t     tblName[2][1024];

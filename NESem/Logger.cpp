@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include <fstream>
 
 void Logger::logHex(uint16_t num)
 {
@@ -16,5 +17,8 @@ void Logger::logInstruction(uint8_t op, const char* name, uint16_t address, uint
     oss << "sp: " << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex << +sp << " ";
     oss << "status: " << "0b" << std::setfill('0') << std::setw(2) << std::right << std::bitset<8>(+status) << std::endl;
     std::cout << oss.str();
+  
+    //file << std::setfill('0') << std::setw(2) << std::right << std::hex << +pc << std::endl;
 }
+
 

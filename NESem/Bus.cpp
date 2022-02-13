@@ -11,23 +11,45 @@ void Bus::loadCartridge(Cartridge* cart)
 	ppu.loadCartridge(cart);
 }
 
+void Bus::setInput(uint8_t* controller)
+{
+	this->controller[0] = controller;
+}
+
 void Bus::write(uint16_t addr, uint8_t data)
 {
 	if (addr >= 0x0000 && addr <= 0x1FFF) ram[addr & 0x07FF] = data;
 	else if (addr >= 0x2000 && addr <= 0x3FFF) ppu.cpuWrite(addr & 0x0007, data);
+	else if (addr == 0x4016 || addr == 0x4017)
+	{
+		//only one controller connected
+		controller_state[0] = **controller;
+		//controller_state[addr & 0x0001];
+	}
 	else cart->cpuWrite(addr, data);
 }
 
 uint8_t Bus::read(uint16_t addr)
 {
+	uint8_t data = 0;
 	if (addr >= 0x0000 && addr <= 0x1FFF) return ram[addr & 0x07FF];
 	else if (addr >= 0x2000 && addr <= 0x3FFF) {
 		return ppu.cpuRead(addr & 0x0007);
 	}
-	uint8_t temp = cart->cpuRead(addr);
+	else if (addr == 0x4016 || addr == 0x4017)
+	{
+		data = (controller_state[addr & 0x0001] & 0x80) > 0;
+		controller_state[addr & 0x0001] <<= 1;
+	}
+	else {
+		uint8_t temp = 0;
+		cart->cpuRead(addr, temp);
+		return temp;
+	}
+	
 	//Logger::logHex(addr);
 	//Logger::logHex(temp);
-	return temp;
+	return data;
 
 }
 

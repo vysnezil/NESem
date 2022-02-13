@@ -95,6 +95,7 @@ void PPU::reset()
 	palScreen[0x3D] = Color(160, 162, 160);
 	palScreen[0x3E] = Color(0, 0, 0);
 	palScreen[0x3F] = Color(0, 0, 0);
+
 }
 
 PPU::PPU()
@@ -175,9 +176,8 @@ uint8_t PPU::ppuRead(uint16_t addr)
 	uint8_t data = 0x00;
 	addr &= 0x3FFF;
 	
-	data = cart->ppuRead(addr);
 
-	if (data)
+	if (cart->ppuRead(addr, data))
 	{
 
 	}
@@ -281,11 +281,10 @@ void PPU::ppuWrite(uint16_t addr, uint8_t data)
 
 }
 
-
 void PPU::clock()
 {
 	//sprScreen.SetPixel(cycle - 1, scanline, palScreen[(rand() % 2) ? 0x3F : 0x30]);
-	if (finished) finished = false;
+	
 
 	
 
@@ -443,9 +442,10 @@ void PPU::clock()
 
 	}
 
-	//Logger::log(palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F]);
-	Color color = palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F];
+	//Logger::logHex(palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F]);
+	
 	if (scanline >= 0 && scanline < 240 && cycle < 256) {
+		Color color = palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F];
 		int index = (scanline * 256 + cycle-1) * 3;
 		dat[index + 0] = color.r;
 		dat[index + 1] = color.g;
@@ -460,6 +460,8 @@ void PPU::clock()
 		if (scanline >= 261)
 		{
 			scanline = -1;
+			frames++;
+			//Logger::log(frames);
 			finished = true;
 		}
 	}
