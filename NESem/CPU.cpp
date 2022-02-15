@@ -153,8 +153,12 @@ uint16_t CPU::IND()
 
 uint16_t CPU::IZX()
 {
-    uint8_t ptr = read(pc++) + x;
-    return read(ptr) & 0x00FF + (read(ptr + 1) << 8) & 0x00FF;
+    uint16_t ptr = read(pc++) + x;
+
+    uint16_t lo = read(ptr & 0x00FF);
+    uint16_t hi = read((ptr + 1) & 0x00FF);
+
+    return (hi << 8) | lo;
 }
 
 uint16_t CPU::IZY()
@@ -764,7 +768,7 @@ void CPU::addInstructions()
     addInstruction(0x8E, "STX", STX, ABS, 4);
 
     addInstruction(0x84, "STY", STY, ZP0, 3);
-    addInstruction(0x94, "STY", STY, ZPY, 4);
+    addInstruction(0x94, "STY", STY, ZPX, 4);
     addInstruction(0x8C, "STY", STY, ABS, 4);
 
     addInstruction(0x1A, "NOP*", NOP, IMP, 2);
