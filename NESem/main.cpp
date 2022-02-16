@@ -9,7 +9,7 @@
 int main() {
 	Display display;
 	Input input(display.window);
-	Cartridge card("..\\roms\\nestest.nes");
+	Cartridge card("..\\roms\\smb.nes");
 	Bus* bus = new Bus();
 	bus->setInput(&input.controller);
 	bus->loadCartridge(&card);
@@ -25,5 +25,5 @@ int main() {
 		display.update(bus->ppu.dat);
 		display.updateEvents();
 	}
-	Logger::file.close();
+	//Logger::file.close();
 }

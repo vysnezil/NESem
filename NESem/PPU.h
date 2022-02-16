@@ -26,13 +26,28 @@ public:
 
 	uint8_t* dat = new uint8_t[256 * 240 * 3];
 
-	uint16_t frames = 0;
+	
+	struct Sprite
+	{
+		uint8_t y;
+		uint8_t id;
+		uint8_t attribute;
+		uint8_t x;
+	} OAM[64];
 
 private:
+	void processForeground();
+
+	void renderForeground();
 
 	uint8_t     tblName[2][1024];
 	uint8_t     tblPattern[2][4096];
 	uint8_t		tblPalette[32];
+
+	Sprite spriteScanline[8];
+	uint8_t spriteCount;
+	uint8_t sprite_shifter_pattern_lo[8];
+	uint8_t sprite_shifter_pattern_hi[8];
 
 	union
 	{
@@ -117,5 +132,16 @@ private:
 	uint16_t bg_shifter_pattern_hi = 0x0000;
 	uint16_t bg_shifter_attrib_lo = 0x0000;
 	uint16_t bg_shifter_attrib_hi = 0x0000;
+
+	
+
+	uint8_t oam_addr = 0x00;
+
+	uint8_t fg_pixel = 0x00;
+	uint8_t fg_palette = 0x00;
+	uint8_t fg_priority = 0x00;
+
+	bool spriteZeroHitPossible = false;
+	bool spriteZeroBeingRendered = false;
 };
 

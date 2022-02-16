@@ -15,6 +15,13 @@ public:
 	uint8_t controller_state[2];
 	uint8_t* controller[2];
 
+	bool DMA = false;
+	bool DMA_sync_flag = true;
+
+	uint8_t DMA_page = 0x00;
+	uint8_t DMA_addr = 0x00;
+	uint8_t DMA_data = 0x00;
+
 public:
 	Bus();
 	void loadCartridge(Cartridge* cart);

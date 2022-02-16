@@ -7,7 +7,7 @@
 #include <fstream>
 
 namespace Logger {
-	static std::ofstream file = std::ofstream("latest.txt");
+	//static std::ofstream file = std::ofstream("latest.txt");
 
 	template<typename T> static void log(T t) {
 		std::cout << t << std::endl;
