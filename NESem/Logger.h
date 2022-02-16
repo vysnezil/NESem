@@ -7,10 +7,15 @@
 #include <fstream>
 
 namespace Logger {
-	//static std::ofstream file = std::ofstream("latest.txt");
+	//static std::ofstream file = std::ofstream("logs/latest.txt");
 
-	template<typename T> static void log(T t) {
-		std::cout << t << std::endl;
+	inline void log() {
+		std::cout << std::endl;
+	}
+
+	template<typename T, typename... Args> void log(T t, Args... args) {
+		std::cout << t;
+		log(args...);
 	}
 
 	void logHex(uint16_t num);

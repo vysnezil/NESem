@@ -7,12 +7,13 @@
 #include "Input.h"
 
 int main(int argc, char** argv) {
+	
+	const char* path = argv[1] ? argv[1] : "..\\roms\\smb.nes";
+	Cartridge card(path);
+
 	Display display;
 	Input input(display.window);
-	const char* path = argv[1] ? argv[1] : "..\\roms\\nestest.nes";
-	Logger::log("Loaded rom: ");
-	Logger::log(path);
-	Cartridge card(path);
+
 	Bus* bus = new Bus();
 	bus->setInput(&input.controller);
 	bus->loadCartridge(&card);

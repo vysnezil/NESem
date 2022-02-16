@@ -14,14 +14,18 @@ Display::Display()
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::log("Failed to initialize GLAD!");
     glfwSetErrorCallback(this->error_callback);
 
+    glfwSwapInterval(0);
+
     texture = setupTexture();
     VAO = setupBuffers();
     shader = createShader();
     glViewport(0, 0, 800, 600);
+
+    lasttime = glfwGetTime();
 }
 
 void Display::error_callback(int error, const char* description) {
-    Logger::log(std::string("OpenGL Error: ") + std::string(description));
+    Logger::log("OpenGL Error: ", std::string(description));
 }
 
 bool Display::shouldClose() {
@@ -29,6 +33,11 @@ bool Display::shouldClose() {
 }
 
 void Display::update(uint8_t* displayData1) {
+    while (glfwGetTime() < lasttime + 1.0 / 60) {
+        //wait
+    }
+    lasttime += 1.0 / 60;
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGB, GL_UNSIGNED_BYTE, displayData1);
     glGenerateMipmap(GL_TEXTURE_2D);
 
@@ -42,6 +51,24 @@ void Display::update(uint8_t* displayData1) {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     glfwSwapBuffers(window);
+    setWindowFPS(window);
+}
+
+void Display::setWindowFPS(GLFWwindow* win)
+{
+    frames++;
+
+    if (glfwGetTime() - lasttimeCounter >= 1.0) {
+        char title[256];
+        title[255] = '\0';
+
+        snprintf(title, 255, "%s - [FPS: %3.2f]", "window", (float)frames);
+
+        glfwSetWindowTitle(win, title);
+
+        frames = 0;
+        lasttimeCounter += 1.0;
+    }
 }
 
 void Display::updateEvents()

@@ -58,8 +58,13 @@ Cartridge::Cartridge(const char* path)
 		}
 
 		file.close();
+		Logger::log("Loaded rom: ", path);
 	}
-	else Logger::log("CARTRIDGE: file opening error");
+	else {
+		Logger::log("CARTRIDGE: file opening error");
+		Logger::log("path: ", path);
+		exit(1);
+	}
 }
 
 bool Cartridge::cpuRead(uint16_t addr, uint8_t& data)
