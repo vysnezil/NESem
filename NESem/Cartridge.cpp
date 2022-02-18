@@ -23,15 +23,19 @@ Cartridge::Cartridge(const char* path)
 	{
 		file.read((char*)&header, sizeof(header));
 
-		//for now, lets assume that this file is valid nes format
-		//if (header.name != "NES") std::cerr << "\nInvalid NES file!";
+		if (header.name[0]  != 'N' && header.name[1] != 'E' && header.name[2] != 'S' && header.name[3] != 0x1A) {
+			Logger::log("CARTRIDGE: Invalid nes file!");
+			Logger::log("path: ", path);
+			exit(1);
+		}
 
 		if (header.flags1 & 0x04) file.seekg(512, std::ios_base::cur);
 		uint8_t mapperID = (header.flags2 | (header.flags1 >> 4));
 		mirror = (header.flags1 & 0x01) ? VERTICAL : HORIZONTAL;
 
 		if (header.flags1 & 0x08) {
-			//handle NES 2.0 format
+			Logger::log("CARTRIDGE: NES2.0 format not supported yet!");
+			exit(1);
 		}
 
 		else {
@@ -49,15 +53,17 @@ Cartridge::Cartridge(const char* path)
 			file.read((char*)CHRMemory, (static_cast<std::streamsize>(8192) * CHRBankCount));
 
 		}
+		file.close();
 
 		switch (mapperID)
 		{
 		case 0:
 			mapper = new Mapper000(PRGBankCount, CHRBankCount);
 			break;
+		default:
+			Logger::log("CARTRIDGE: Mapper ", std::to_string(mapperID), " not supported!");
+			exit(1);
 		}
-
-		file.close();
 		Logger::log("Loaded rom: ", path);
 	}
 	else {

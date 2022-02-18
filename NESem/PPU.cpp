@@ -297,7 +297,7 @@ void PPU::clock()
 
 	if (scanline >= -1 && scanline < 240)
 	{
-		if (scanline == 0 && cycle == 0)
+		if (cycle == 0)
 		{
 			cycle = 1;
 		}
@@ -543,10 +543,11 @@ void PPU::clock()
 	}
 
 	//Logger::logHex(palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F]);
-	
-	if (scanline >= 0 && scanline < 240 && cycle < 256) {
-		Color color = palScreen[ppuRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
-		int index = (scanline * 256 + cycle) * 3;
+
+	Color color = palScreen[ppuRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
+	if (scanline >= 0 && scanline < 240 && cycle <= 256) {
+		
+		int index = (scanline * 256 + cycle-1) * 3;
 		dat[index + 0] = color.r;
 		dat[index + 1] = color.g;
 		dat[index + 2] = color.b;
