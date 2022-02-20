@@ -22,7 +22,7 @@ uint8_t CPU::read(uint16_t address) {
 void CPU::reset() {
 	x = y = a = sp = status = address = 0;
 	setFlag(U, 1);
-	sp = 0x00FF;
+	sp = 0xFD;
 	pc = read(0xFFFC) | (read(0xFFFD) << 8);
 }
 

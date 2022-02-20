@@ -1,12 +1,28 @@
 #include "Input.h"
 
 uint8_t Input::controller = 0;
+bool Input::singleStep = true;
+bool Input::step = false;
+bool Input::stepFrame = false;
 
 void Input::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS) {
         switch (key)
         {
+        case GLFW_KEY_D:
+            step = true;
+            Logger::log("Input: STEPPED");
+            break;
+        case GLFW_KEY_F:
+            stepFrame = true;
+            Logger::log("Input: Frame stepped");
+            break;
+        case GLFW_KEY_SPACE:
+            singleStep = !singleStep;
+            Logger::log("Single Stepping: ", singleStep ? "true" : "false");
+            break;
+
         case GLFW_KEY_DOWN:
             controller |= 0x04;
             break;

@@ -40,6 +40,8 @@ private:
 
 	void renderForeground();
 
+	Color prev;
+
 	uint8_t     tblName[2][1024];
 	uint8_t     tblPattern[2][4096];
 	uint8_t		tblPalette[32];

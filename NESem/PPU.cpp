@@ -1,5 +1,6 @@
 #include "PPU.h"
 #include "Logger.h"
+#include "Input.h"
 
 void PPU::loadCartridge(Cartridge* cartridge)
 {
@@ -201,7 +202,6 @@ uint8_t PPU::ppuRead(uint16_t addr)
 
 		if (cart->mirror == Cartridge::MIRROR::VERTICAL)
 		{
-			// Vertical
 			if (addr >= 0x0000 && addr <= 0x03FF)
 				data = tblName[0][addr & 0x03FF];
 			if (addr >= 0x0400 && addr <= 0x07FF)
@@ -213,7 +213,6 @@ uint8_t PPU::ppuRead(uint16_t addr)
 		}
 		else if (cart->mirror == Cartridge::MIRROR::HORIZONTAL)
 		{
-			// Horizontal
 			if (addr >= 0x0000 && addr <= 0x03FF)
 				data = tblName[0][addr & 0x03FF];
 			if (addr >= 0x0400 && addr <= 0x07FF)
@@ -469,10 +468,9 @@ void PPU::clock()
 		}
 	}
 
-	uint8_t bg_pixel = 0x00;   // The 2-bit pixel to be rendered
-	uint8_t bg_palette = 0x00; // The 3-bit index of the palette the pixel indexes
+	uint8_t bg_pixel = 0x00;
+	uint8_t bg_palette = 0x00;
 
-	// the current background colour in effect
 	if (mask.render_background)
 	{
 		uint16_t bit_mux = 0x8000 >> fine_x;
@@ -480,7 +478,6 @@ void PPU::clock()
 		uint8_t p1_pixel = (bg_shifter_pattern_hi & bit_mux) > 0;
 		bg_pixel = (p1_pixel << 1) | p0_pixel;
 
-		// Get palette
 		uint8_t bg_pal0 = (bg_shifter_attrib_lo & bit_mux) > 0;
 		uint8_t bg_pal1 = (bg_shifter_attrib_hi & bit_mux) > 0;
 		bg_palette = (bg_pal1 << 1) | bg_pal0;
@@ -544,14 +541,41 @@ void PPU::clock()
 
 	//Logger::logHex(palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F]);
 
+	//if (scanline == 0xC0) Input::singleStep = true;
+
 	Color color = palScreen[ppuRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
 	if (scanline >= 0 && scanline < 240 && cycle <= 256) {
 		
-		int index = (scanline * 256 + cycle-1) * 3;
+		int index = (scanline * 256 + cycle - 2) * 3;
 		dat[index + 0] = color.r;
 		dat[index + 1] = color.g;
 		dat[index + 2] = color.b;
+
+		/*if (true) {
+			int index = (scanline * 256 + cycle - 1) * 3;
+			dat[index + 0] = 255;
+			dat[index + 1] = 0;
+			dat[index + 2] = 0;
+		}*/
+
+		//prev = color;
+		/*
+		for (uint8_t i = 0; i < spriteCount; i++)
+		{
+			if (cycle == OAM[i].x) {
+				dat[index + 0] = 255;
+				dat[index + 1] = 0;
+				dat[index + 2] = 0;
+			}
+		if (scanline == OAM[i].y) {
+			dat[index + 0] = 255;
+			dat[index + 1] = 0;
+			dat[index + 2] = 0;
+		}
+		}*/
 	}
+
+	
 
 	cycle++;
 	if (cycle >= 341)

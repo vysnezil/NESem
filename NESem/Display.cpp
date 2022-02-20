@@ -9,23 +9,28 @@ unsigned int texture, VAO;
 Display::Display()
 {
 	if (!glfwInit()) Logger::log("Failed to initialize GLFW!");
-	window = glfwCreateWindow(800, 600, "window", NULL, NULL);
+	window = glfwCreateWindow(768, 720, "NESem", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::log("Failed to initialize GLAD!");
     glfwSetErrorCallback(this->error_callback);
+    glfwSetFramebufferSizeCallback(window, this->size_callback);
 
     glfwSwapInterval(0);
 
     texture = setupTexture();
     VAO = setupBuffers();
     shader = createShader();
-    glViewport(0, 0, 800, 600);
 
     lasttime = glfwGetTime();
 }
 
 void Display::error_callback(int error, const char* description) {
     Logger::log("OpenGL Error: ", std::string(description));
+}
+
+void Display::size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
 }
 
 bool Display::shouldClose() {
@@ -62,7 +67,7 @@ void Display::setWindowFPS(GLFWwindow* win)
         char title[256];
         title[255] = '\0';
 
-        snprintf(title, 255, "%s - [FPS: %3.2f]", "window", (float)frames);
+        snprintf(title, 255, "%s - [FPS: %3.2f]", "NESem", (float)frames);
 
         glfwSetWindowTitle(win, title);
 

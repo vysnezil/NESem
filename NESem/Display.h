@@ -17,6 +17,7 @@ public:
 
 private:
 	static void error_callback(int error, const char* description);
+	static void size_callback(GLFWwindow* window, int width, int height);
 	GLuint createShader();
 	unsigned int setupTexture();
 	unsigned int setupBuffers();

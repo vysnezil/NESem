@@ -26,7 +26,8 @@ Cartridge::Cartridge(const char* path)
 		if (header.name[0]  != 'N' && header.name[1] != 'E' && header.name[2] != 'S' && header.name[3] != 0x1A) {
 			Logger::log("CARTRIDGE: Invalid nes file!");
 			Logger::log("path: ", path);
-			exit(1);
+			file.close();
+			return;
 		}
 
 		if (header.flags1 & 0x04) file.seekg(512, std::ios_base::cur);
@@ -35,7 +36,6 @@ Cartridge::Cartridge(const char* path)
 
 		if (header.flags1 & 0x08) {
 			Logger::log("CARTRIDGE: NES2.0 format not supported yet!");
-			exit(1);
 		}
 
 		else {
@@ -62,14 +62,14 @@ Cartridge::Cartridge(const char* path)
 			break;
 		default:
 			Logger::log("CARTRIDGE: Mapper ", std::to_string(mapperID), " not supported!");
-			exit(1);
+			return;
 		}
 		Logger::log("Loaded rom: ", path);
+		success = true;
 	}
 	else {
 		Logger::log("CARTRIDGE: file opening error");
 		Logger::log("path: ", path);
-		exit(1);
 	}
 }
 
