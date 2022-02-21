@@ -2,6 +2,7 @@
 #include <cstdint>
 #include "Cartridge.h"
 #include "Color.h"
+#include <cstring>
 
 class PPU
 {

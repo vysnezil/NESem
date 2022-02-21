@@ -1,8 +1,10 @@
 #include "CPU.h"
 #include "Bus.h"
+#include "Input.h"
 
 CPU::CPU()
 {
+    for (size_t i = 0; i <= 0xFF; i++) instructionTable[i] = { "XXX", &CPU::XXX, &CPU::IMP, 0 };
     this->addInstructions();
 }
 
@@ -20,7 +22,8 @@ uint8_t CPU::read(uint16_t address) {
 }
 
 void CPU::reset() {
-	x = y = a = sp = status = address = 0;
+	x = y = a = status = 0;
+    address = sp = 0;
 	setFlag(U, 1);
 	sp = 0xFD;
 	pc = read(0xFFFC) | (read(0xFFFD) << 8);
@@ -31,11 +34,10 @@ void CPU::clock() {
         setFlag(U, 1);
         uint16_t pc_tmp = pc;
 		op = read(pc++);
-		cycles = instructionTable[op].cycles;
+        cycles = instructionTable[op].cycles;
 		address = (this->*instructionTable[op].mode)();
-        //Logger::logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status, pc_tmp);
-		(this->*instructionTable[op].function)();
-        
+         //Logger::logInstruction(op, instructionTable[op].name, address, x, y, a, sp, status, pc_tmp);
+		(this->*instructionTable[op].function)();  
 	}
 	cycles--;
 }
@@ -180,25 +182,26 @@ uint16_t CPU::REL()
 
 void CPU::LDA()
 {
-    a = getAddress();
+    a = (uint8_t)getAddress();
     updateFlags(a);
 }
 
 void CPU::LDX()
 {
-    x = getAddress();
+    x = (uint8_t)getAddress();
     updateFlags(x);
 }
 
 void CPU::LDY()
 {
-    y = getAddress();
+    y = (uint8_t)getAddress();
     updateFlags(y);
 }
 
 void CPU::XXX()
 {
-    //TODO: remove this instrunction
+    Logger::log("Invalid instruction occured (", std::to_string(op), ") at address ", std::to_string(pc - 1),  " EMULATOR HALTED (press space to continue)");
+    Input::singleStep = true; 
 }
 
 void CPU::JMP()
@@ -469,9 +472,9 @@ void CPU::TXS()
 
 void CPU::ASL()
 {
-    uint16_t temp = (uint16_t)getAddress() << 1;
+    uint16_t temp = getAddress() << 1;
     setFlag(C, (temp & 0xFF00) > 0);
-    updateFlags(temp);
+    updateFlags((uint8_t)temp);
     if (instructionTable[op].mode == &CPU::IMP)
         a = temp & 0x00FF;
     else
@@ -492,9 +495,9 @@ void CPU::LSR()
 
 void CPU::ROL()
 {
-    uint16_t temp = (getAddress() << 1) | getFlag(C);
+    uint16_t temp = (getAddress() << 1) | (uint8_t)getFlag(C);
     setFlag(C, temp & 0xFF00);
-    updateFlags(temp);
+    updateFlags((uint8_t)temp);
     if (instructionTable[op].mode == &CPU::IMP)
         a = temp & 0x00FF;
     else
@@ -505,7 +508,7 @@ void CPU::ROR()
 {
     uint16_t temp = (uint16_t)(getFlag(C) << 7) | (getAddress() >> 1);
     setFlag(C, getAddress() & 0x01);
-    updateFlags(temp);
+    updateFlags((uint8_t)temp);
     if (instructionTable[op].mode == &CPU::IMP)
         a = temp & 0x00FF;
     else
@@ -582,7 +585,7 @@ void CPU::CMP()
 {
     uint16_t tmp = (uint16_t)a - (uint16_t)getAddress();
     setFlag(C, a >= getAddress());
-    updateFlags(tmp);
+    updateFlags((uint8_t)tmp);
     cycles++;
 }
 

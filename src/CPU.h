@@ -43,7 +43,7 @@ private:
     uint8_t op;
 
     uint8_t cycles;
-    INSTRUCTION instructionTable[0xFF];
+    INSTRUCTION instructionTable[0x100];
 
     uint8_t read(uint16_t address);
     void write(uint16_t address, uint8_t data);
