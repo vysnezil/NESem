@@ -12,6 +12,8 @@ endif()
 
 message("nfd Platform: ${nfd_PLATFORM}")
 
+set (CMAKE_CXX_STANDARD 17)
+
 set(nfd_COMPILER Undefined)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
   # This is clang-cl, which has different compiler options

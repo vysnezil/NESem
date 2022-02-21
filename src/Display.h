@@ -24,5 +24,7 @@ private:
 	double lasttime = 0;
 	double lasttimeCounter = 0;
 	uint16_t frames = 0;
+	
+	uint8_t* dat = new uint8_t[768*720*3];
 };
 

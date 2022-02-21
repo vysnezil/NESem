@@ -37,8 +37,6 @@ void Display::update(uint8_t* displayData1) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    uint8_t* dat = new uint8_t[768*720*3];
-
     for (size_t y = 0; y < 240; y++)
     {
         for (size_t i = 0; i < 3; i++)
