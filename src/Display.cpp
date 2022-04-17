@@ -7,50 +7,14 @@ unsigned int texture, VAO;
 
 Display::Display()
 {
-	if (!glfwInit()) Logger::log("Failed to initialize GLFW!");
-	window = glfwCreateWindow(768, 720, "NESem", NULL, NULL);
-	glfwMakeContextCurrent(window);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::log("Failed to initialize GLAD!");
-    glfwSetErrorCallback(this->error_callback);
-    glfwSetFramebufferSizeCallback(window, this->size_callback);
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
-
-    glfwSwapInterval(0);
+    glHelper::getInstance().glInit();
+    window = glHelper::getInstance().window;
 
     texture = setupTexture();
     VAO = setupBuffers();
     shader = createShader();
 
     lasttime = glfwGetTime();
-}
-
-void Display::error_callback(int error, const char* description) {
-    Logger::log("OpenGL Error: ", std::string(description));
-}
-
-void Display::size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-bool Display::shouldClose() {
-    bool close = glfwWindowShouldClose(window);
-    if (close){
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplGlfw_Shutdown();
-        ImGui::DestroyContext();
-
-        glfwDestroyWindow(window);
-        glfwTerminate();
-    }
-    
-	return close;
 }
 
 void Display::update(uint8_t* displayData1) {
@@ -62,13 +26,6 @@ void Display::update(uint8_t* displayData1) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGB, GL_UNSIGNED_BYTE, displayData1);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(.5f, .5f, .5f, 1.0f);
-    
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
     glUseProgram(shader);
 
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -79,11 +36,7 @@ void Display::update(uint8_t* displayData1) {
     ImGui::Text("This is some useful text.");  
     ImGui::End();
 
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    glfwSwapBuffers(window);
-    setWindowFPS(window); 
+    setWindowFPS(window);
 }
 
 void Display::setWindowFPS(GLFWwindow* win)
@@ -101,11 +54,6 @@ void Display::setWindowFPS(GLFWwindow* win)
         frames = 0;
         lasttimeCounter += 1.0;
     }
-}
-
-void Display::updateEvents()
-{
-    glfwPollEvents();
 }
 
 GLuint Display::createShader() {
