@@ -14,6 +14,13 @@ Display::Display()
     glfwSetErrorCallback(this->error_callback);
     glfwSetFramebufferSizeCallback(window, this->size_callback);
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
     glfwSwapInterval(0);
 
     texture = setupTexture();
@@ -33,7 +40,17 @@ void Display::size_callback(GLFWwindow* window, int width, int height)
 }
 
 bool Display::shouldClose() {
-	return glfwWindowShouldClose(window);
+    bool close = glfwWindowShouldClose(window);
+    if (close){
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+    
+	return close;
 }
 
 void Display::update(uint8_t* displayData1) {
@@ -47,6 +64,10 @@ void Display::update(uint8_t* displayData1) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(.5f, .5f, .5f, 1.0f);
+    
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
 
     glUseProgram(shader);
 
@@ -54,8 +75,15 @@ void Display::update(uint8_t* displayData1) {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+    ImGui::Begin("My First Tool");
+    ImGui::Text("This is some useful text.");  
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     glfwSwapBuffers(window);
-    setWindowFPS(window);
+    setWindowFPS(window); 
 }
 
 void Display::setWindowFPS(GLFWwindow* win)
