@@ -12,18 +12,20 @@
 int main(int argc, char** argv) {
 	
 
-	/*const char* path = argv[1] ? argv[1] : Dialog::getFile();
-	
+	//const char* path = argv[1] ? argv[1] : Dialog::getFile();
+
+	Logger logger = Logger::getInstance();
+
 	//const char* path = "..\\roms\\smb.nes";
-	Cartridge card(path);
+	/*Cartridge card(path);
 
 	if (!card.success) {
 		std::string unused;
-		Logger::log("Press ENTER to exit");
+		logger.log("Press ENTER to exit");
 		std::getline(std::cin, unused);
-		exit(1);
+		exit(1);*/
 	}
-
+	/*
 	Display display;
 	Input input(glHelper::getInstance().window);
 
@@ -37,7 +39,7 @@ int main(int argc, char** argv) {
 
 	Menu menu;
 	glHelper gl = glHelper::getInstance();
-	Logger logger = Logger::getInstance();
+	
 
 	
 

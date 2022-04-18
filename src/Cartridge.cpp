@@ -1,5 +1,6 @@
 #include "Cartridge.h"
 #include "Mapper/Mapper000.h"
+#include "SaveManager.h"
 
 Cartridge::Cartridge(const char* path)
 {
@@ -20,6 +21,13 @@ Cartridge::Cartridge(const char* path)
 
 	std::ifstream file;
 	file.open(path, std::ifstream::binary);
+	file.seekg(0, std::ios::beg);
+
+	std::stringstream buffer;
+	buffer << file.rdbuf();
+	auto hash = SaveManager::getInstance().getHash(strdup(buffer.str().c_str()));
+	logger.log("Rom hash:", hash);
+
 	file.seekg(0, std::ios::beg);
 	if (file.is_open())
 	{

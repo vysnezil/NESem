@@ -1,4 +1,5 @@
 #include "Menu.h"
+#include "SaveManager.h"
 
 Menu::Menu()
 {
@@ -34,7 +35,7 @@ void Menu::update()
     }
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
-    if (ImGui::Button("Load save", ImVec2(128, 45))) Logger::getInstance().popupErr("err");
+    if (ImGui::Button("Load save", ImVec2(128, 45))) Logger::getInstance().popupErr((char*)SaveManager::getInstance().getHash("helo"));
     ImGui::SameLine();
     ImGui::BeginGroup();
     ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
