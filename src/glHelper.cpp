@@ -1,7 +1,7 @@
 #include "glHelper.h"
 
 void glHelper::error_callback(int error, const char* description) {
-    Logger::log("OpenGL Error: ", std::string(description));
+    Logger::getInstance().log("OpenGL Error: ", std::string(description));
 }
 
 void glHelper::size_callback(GLFWwindow* window, int width, int height)
@@ -11,10 +11,10 @@ void glHelper::size_callback(GLFWwindow* window, int width, int height)
 
 void glHelper::glInit() {
     if (!initialized) {
-        if (!glfwInit()) Logger::log("Failed to initialize GLFW!");
+        if (!glfwInit()) Logger::getInstance().log("Failed to initialize GLFW!");
         window = glfwCreateWindow(768, 720, "NESem", NULL, NULL);
         glfwMakeContextCurrent(window);
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::log("Failed to initialize GLAD!");
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::getInstance().log("Failed to initialize GLAD!");
         glfwSetErrorCallback(this->error_callback);
         glfwSetFramebufferSizeCallback(window, this->size_callback);
 

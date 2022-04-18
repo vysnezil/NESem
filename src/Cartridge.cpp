@@ -16,6 +16,8 @@ Cartridge::Cartridge(const char* path)
 		char unused[5];
 	} header;
 
+	auto logger = Logger::getInstance();
+
 	std::ifstream file;
 	file.open(path, std::ifstream::binary);
 	file.seekg(0, std::ios::beg);
@@ -24,8 +26,8 @@ Cartridge::Cartridge(const char* path)
 		file.read((char*)&header, sizeof(header));
 
 		if (header.name[0]  != 'N' && header.name[1] != 'E' && header.name[2] != 'S' && header.name[3] != 0x1A) {
-			Logger::log("CARTRIDGE: Invalid nes file!");
-			Logger::log("path: ", path);
+			logger.log("CARTRIDGE: Invalid nes file!");
+			logger.log("path: ", path);
 			file.close();
 			return;
 		}
@@ -35,7 +37,7 @@ Cartridge::Cartridge(const char* path)
 		mirror = (header.flags1 & 0x01) ? VERTICAL : HORIZONTAL;
 
 		if (header.flags1 & 0x08) {
-			Logger::log("CARTRIDGE: NES2.0 format not supported yet!");
+			logger.log("CARTRIDGE: NES2.0 format not supported yet!");
 		}
 
 		else {
@@ -61,15 +63,15 @@ Cartridge::Cartridge(const char* path)
 			mapper = new Mapper000(PRGBankCount, CHRBankCount);
 			break;
 		default:
-			Logger::log("CARTRIDGE: Mapper ", std::to_string(mapperID), " not supported!");
+			logger.log("CARTRIDGE: Mapper ", std::to_string(mapperID), " not supported!");
 			return;
 		}
-		Logger::log("Loaded rom: ", path);
+		logger.log("Loaded rom: ", path);
 		success = true;
 	}
 	else {
-		Logger::log("CARTRIDGE: file opening error");
-		Logger::log("path: ", path);
+		logger.log("CARTRIDGE: file opening error");
+		logger.log("path: ", path);
 	}
 }
 

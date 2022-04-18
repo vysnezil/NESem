@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "Dialog.h"
 #include "Menu.h"
+#include "Logger.h"
 
 int main(int argc, char** argv) {
 	
@@ -35,7 +36,8 @@ int main(int argc, char** argv) {
 	//uint8_t* dat = new uint8_t[256 * 240 * 3];
 
 	Menu menu;
-	auto gl = glHelper::getInstance();
+	glHelper gl = glHelper::getInstance();
+	Logger logger = Logger::getInstance();
 
 	
 
@@ -44,6 +46,7 @@ int main(int argc, char** argv) {
 		if (true) {
 			menu.update();
 		}
+		//logger.updatePopup();
 		/*else {
 			if (!Input::singleStep) {
 				do { bus->clock(); } while (!bus->ppu.finished);

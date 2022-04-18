@@ -20,7 +20,7 @@ char* Dialog::getFile()
     }
     else
     {
-        Logger::log("File picker: Error: ", NFD_GetError());
+        Logger::getInstance().log("File picker: Error: ", NFD_GetError());
     }
 
     NFD_Quit();

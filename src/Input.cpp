@@ -12,15 +12,15 @@ void Input::key_callback(GLFWwindow* window, int key, int scancode, int action, 
         {
         case GLFW_KEY_D:
             step = true;
-            Logger::log("Input: STEPPED");
+            Logger::getInstance().log("Input: STEPPED");
             break;
         case GLFW_KEY_F:
             stepFrame = true;
-            Logger::log("Input: Frame stepped");
+            Logger::getInstance().log("Input: Frame stepped");
             break;
         case GLFW_KEY_SPACE:
             singleStep = !singleStep;
-            Logger::log("Single Stepping: ", singleStep ? "true" : "false");
+            Logger::getInstance().log("Single Stepping: ", singleStep ? "true" : "false");
             break;
 
         case GLFW_KEY_DOWN:

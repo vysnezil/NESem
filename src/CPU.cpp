@@ -200,7 +200,7 @@ void CPU::LDY()
 
 void CPU::XXX()
 {
-    Logger::log("Invalid instruction occured (", std::to_string(op), ") at address ", std::to_string(pc - 1),  " EMULATOR HALTED (press space to continue)");
+    Logger::getInstance().log("Invalid instruction occured (", std::to_string(op), ") at address ", std::to_string(pc - 1), " EMULATOR HALTED (press space to continue)");
     Input::singleStep = true; 
 }
 
