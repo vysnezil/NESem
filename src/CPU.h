@@ -36,6 +36,8 @@ public:
 
     Save::CPUstate getState();
 
+    void loadState(Save::CPUstate state);
+
 private:
     //Internal registers
     uint8_t x, y, a, sp, status;

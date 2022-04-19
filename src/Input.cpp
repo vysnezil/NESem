@@ -6,7 +6,7 @@ bool Input::singleStep = false;
 bool Input::step = false;
 bool Input::stepFrame = false;
 bool Input::saveFlag = false;
-bool Input::menuFlag = true;
+bool Input::menuFlag = false;
 
 void Input::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {

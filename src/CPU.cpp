@@ -18,6 +18,18 @@ Save::CPUstate CPU::getState() {
     };
 }
 
+void CPU::loadState(Save::CPUstate state) {
+    this->reset();
+    x = state.x;
+    y = state.y;
+    a = state.a;
+    sp = state.sp;
+    status = state.status;
+    pc = state.pc;
+    address = state.address;
+    cycles = state.cycles;
+}
+
 void CPU::write(uint16_t address, uint8_t data)
 {
 	bus->write(address, data);

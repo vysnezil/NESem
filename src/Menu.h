@@ -1,6 +1,7 @@
 #include "glHelper.h"
 #include <string>
 #include <vector>
+#include "Cartridge.h"
 
 class Menu
 {
@@ -11,4 +12,5 @@ public:
 	std::vector<std::string>* saves = new std::vector<std::string>();
 	std::string selectedSave;
 	bool show = true;
+	Cartridge* card = nullptr;
 };

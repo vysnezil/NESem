@@ -13,34 +13,44 @@
 int main(int argc, char** argv) {
 	
 
-	const char* path = argv[1] ? argv[1] : Dialog::getFile();
+	//const char* path = argv[1] ? argv[1] : Dialog::getFile();
 
 	Logger logger = Logger::getInstance();
 
 	//const char* path = "..\\roms\\smb.nes";
-	Cartridge card(path);
-
+	
+	
+	/*
 	if (!card.success) {
 		std::string unused;
 		logger.log("Press ENTER to exit");
 		std::getline(std::cin, unused);
 		exit(1);
-	}
+	}*/
 	
-	Display display;
-	Input input(glHelper::getInstance().window);
-
-	Bus* bus = new Bus();
-	bus->setInput(&input.controller);
-	bus->loadCartridge(&card);
-	bus->reset();
+	
 
 	Menu menu;
 	glHelper gl = glHelper::getInstance();
 	
+	Bus* bus = new Bus();
+	Input input(glHelper::getInstance().window);
+
+	if (argv[1]){
+		menu.card = new Cartridge(argv[1]);
+		menu.show = false;
+		bus->loadCartridge(menu.card);
+		bus->setInput(&input.controller);
+		bus->reset();
+	}
+
+	Display display;
 	
-	menu.saves = SaveManager::getInstance().getSavesByRom((char*)card.hash);
+	bus->setInput(&input.controller);
+
+	//menu.saves = SaveManager::getInstance().getSavesByRom((char*)menu.card->hash);
 	if (menu.saves->size() > 0) menu.selectedSave = menu.saves->at(0);
+	SaveManager::getInstance().bus = bus;
 
 	while (!gl.shouldClose()) {
 		gl.setupRender();
@@ -49,7 +59,9 @@ int main(int argc, char** argv) {
 		}
 		else {
 			if (input.menuFlag) {
+				menu.saves = SaveManager::getInstance().getSavesByRom((char*)menu.card->hash);
 				menu.show = true;
+				glHelper::getInstance().resizeWindow(true);
 				input.menuFlag = false;
 			}
 			if (!Input::singleStep) {

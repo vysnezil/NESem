@@ -16,7 +16,7 @@ char* Dialog::getFile()
     }
     else if (result == NFD_CANCEL)
     {
-        exit(0);
+        return "";
     }
     else
     {

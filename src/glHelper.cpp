@@ -12,7 +12,7 @@ void glHelper::size_callback(GLFWwindow* window, int width, int height)
 void glHelper::glInit() {
     if (!initialized) {
         if (!glfwInit()) Logger::getInstance().log("Failed to initialize GLFW!");
-        window = glfwCreateWindow(768, 720, "NESem", NULL, NULL);
+        window = glfwCreateWindow(280*2, 295, "NESem", NULL, NULL);
         glfwMakeContextCurrent(window);
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::getInstance().log("Failed to initialize GLAD!");
         glfwSetErrorCallback(this->error_callback);
@@ -56,4 +56,9 @@ void glHelper::setupRender() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
+}
+
+void glHelper::resizeWindow(bool menu)
+{
+    glfwSetWindowSize(window, menu ? 560 : 768, menu ? 295 : 720);
 }

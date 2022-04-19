@@ -21,7 +21,7 @@ public:
 	Save* save(Bus* bus);
 
 	std::string hash;
-
+	Bus* bus;
 	void writeToFile(Save* save);
 
 	std::vector<std::string>* getSavesByRom(char* hash);

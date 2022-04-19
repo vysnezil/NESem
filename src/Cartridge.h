@@ -31,5 +31,6 @@ public:
 
 	bool success;
 	const char* hash;
+	std::string name;
 };
 

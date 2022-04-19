@@ -126,5 +126,7 @@ void SaveManager::loadSave(std::string name)
 {
 	json js = readFile(hash ,name);
 	Save* save = getFromJson(js);
-
+	bus->system_clocks = save->system_clocks;
+	bus->cpu.loadState(save->cpu_state);
+	bus->ppu.loadState(save->ppu_state);
 }

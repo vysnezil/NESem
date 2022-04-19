@@ -20,6 +20,7 @@ Cartridge::Cartridge(const char* path)
 	auto logger = Logger::getInstance();
 
 	std::ifstream file;
+	name = path;
 	file.open(path, std::ifstream::binary);
 	file.seekg(0, std::ios::end);
 	size_t file_size_in_byte = file.tellg();

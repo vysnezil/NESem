@@ -20,6 +20,7 @@ public:
 	bool shouldClose();
 
 	void setupRender();
+	void resizeWindow(bool menu);
 
 	static void error_callback(int error, const char* description);
 	static void size_callback(GLFWwindow* window, int width, int height);

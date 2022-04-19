@@ -18,6 +18,20 @@ Save::PPUstate PPU::getState() {
 	return state;
 }
 
+void PPU::loadState(Save::PPUstate state) {
+	this->reset();
+	/*memcpy(OAM, state.OAM, 64 * sizeof(Save::Sprite));
+	memcpy(tblName, state.tblName, 2*1024);
+	memcpy(tblPattern, state.tblPattern, 2*4096);
+	memcpy(tblPalette, state.tblPalette, 32);*/
+	status.reg = state.status;
+	mask.reg = state.mask;
+	control.reg = state.control;
+	vram_addr.reg = state.vram_addr;
+	tram_addr.reg = state.tram_addr;
+	fine_x = state.fine_x;
+}
+
 void PPU::reset()
 {
 	fine_x = 0x00;

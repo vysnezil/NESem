@@ -32,10 +32,6 @@ void Display::update(uint8_t* displayData1) {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    ImGui::Begin("My First Tool");
-    ImGui::Text("This is some useful text.");  
-    ImGui::End();
-
     setWindowFPS(window);
 }
 

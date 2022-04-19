@@ -20,6 +20,8 @@ public:
 
 	Save::PPUstate getState();
 
+	void loadState(Save::PPUstate state);
+
 public:
 	void loadCartridge(Cartridge* cartridge);
 	void clock();
