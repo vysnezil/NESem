@@ -17,6 +17,7 @@ Save* SaveManager::save(Bus* bus)
 	Save* save = new Save{
 		bus->cpu.getState(),
 		bus->ppu.getState(),
+		bus->ram,
 		bus->system_clocks,
 		"New Save",
 		bus->ppu.dat,
@@ -53,14 +54,18 @@ std::vector<std::string>* SaveManager::getSavesByRom(char* hash) {
 	std::string path = "saves/" + (std::string)hash;
 	if (std::filesystem::exists(path)) {
 		for (const auto& entry : std::filesystem::directory_iterator(path))
-			saves->push_back(entry.path().filename().string());
+			saves->push_back(entry.path().filename().replace_extension().string());
 	}
 	return saves;
 }
 
 json SaveManager::saveToJson(Save* save) {
+	std::ostringstream ram;
+	ram << std::hex;
+	for (size_t i = 0; i < 2048; i++) ram << std::to_string(save->ram[i]);
 	return {
 		{"name", save->name},
+		{"ram", ram.str()},
 		{"cpuState", {
 			{"x", save->cpu_state.x},
 			{"y", save->cpu_state.y},
@@ -86,6 +91,12 @@ json SaveManager::saveToJson(Save* save) {
 
 Save* SaveManager::getFromJson(json json) {
 	Save* save = new Save();
+	std::string ramS = json["ram"];
+	uint8_t ram[2048];
+	for (size_t i = 0; i < 2048; i++)
+	{
+		ram[i] = '0' + ramS[i];
+	}
 	save->name = json["name"];
 	save->cpu_state.x = json["cpuState"]["x"];
 	save->cpu_state.y = json["cpuState"]["y"];
@@ -103,6 +114,7 @@ Save* SaveManager::getFromJson(json json) {
 	save->ppu_state.fine_x = json["ppuState"]["fine_x"];
 	save->system_clocks = json["clocks"];
 	save->romHash = json["hash"];
+	save->ram = ram;
 	return save;
 }
 
@@ -112,7 +124,7 @@ json SaveManager::readFile(std::string hash, std::string name) {
 	if (std::filesystem::exists(path)) {
 		Logger::getInstance().log(path + "/" + name);
 		std::ifstream i;
-		i.open(path + "/" + name);
+		i.open(path + "/" + name + ".json");
 		std::stringstream ss;
 		ss << i.rdbuf();
 		Logger::getInstance().log(ss.str());
@@ -126,7 +138,15 @@ void SaveManager::loadSave(std::string name)
 {
 	json js = readFile(hash ,name);
 	Save* save = getFromJson(js);
+	memcpy(bus->ram, save->ram, 2048);
 	bus->system_clocks = save->system_clocks;
 	bus->cpu.loadState(save->cpu_state);
 	bus->ppu.loadState(save->ppu_state);
+}
+
+void SaveManager::renameSave(std::string name, std::string newName) {
+	std::string path = "saves/" + (std::string)hash;
+	if (std::filesystem::exists(path + "/" + name + ".json")) {
+		std::rename((path + "/" + name + ".json").c_str(), (path + "/" + newName + ".json").c_str());
+	}
 }

@@ -13,5 +13,8 @@ public:
 	static bool stepFrame;
 	static bool saveFlag;
 	static bool menuFlag;
+	static int keys[8];
+	static int recordKey;
+	static char* getArrow(int code);
 };
 

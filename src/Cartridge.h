@@ -29,7 +29,7 @@ public:
 	bool ppuRead(uint16_t addr, uint8_t & data);
 	bool ppuWrite(uint16_t addr, uint8_t data);
 
-	bool success;
+	bool success = 0;
 	const char* hash;
 	std::string name;
 };

@@ -34,6 +34,8 @@ public:
 
 	void loadSave(std::string name);
 
+	void renameSave(std::string name, std::string newName);
+
 	const char* getHash(char* cart, size_t size);
 
 	static SaveManager& getInstance() {

@@ -19,7 +19,6 @@ Save::CPUstate CPU::getState() {
 }
 
 void CPU::loadState(Save::CPUstate state) {
-    this->reset();
     x = state.x;
     y = state.y;
     a = state.a;

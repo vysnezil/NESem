@@ -9,11 +9,11 @@ void PPU::loadCartridge(Cartridge* cartridge)
 
 Save::PPUstate PPU::getState() {
 	Save::PPUstate state = {
-		dat, *OAM,
-		**tblName, **tblPattern, *tblPalette,
 		status.reg, mask.reg, control.reg,
 		(uint16_t)vram_addr.reg, (uint16_t)tram_addr.reg,
-		fine_x
+		fine_x,
+		dat, *OAM,
+		**tblName, **tblPattern, *tblPalette
 	};
 	return state;
 }
