@@ -21,6 +21,8 @@ public:
 	uint8_t DMA_page = 0x00;
 	uint8_t DMA_addr = 0x00;
 	uint8_t DMA_data = 0x00;
+	
+	uint64_t system_clocks = 0;
 
 public:
 	Bus();
@@ -29,8 +31,6 @@ public:
 	void write(uint16_t addr, uint8_t data);
 	uint8_t read(uint16_t addr);
 
-private:
-	uint64_t system_clocks = 0;
 
 public:
 	void reset();

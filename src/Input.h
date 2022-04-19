@@ -11,5 +11,7 @@ public:
 	static bool singleStep;
 	static bool step;
 	static bool stepFrame;
+	static bool saveFlag;
+	static bool menuFlag;
 };
 

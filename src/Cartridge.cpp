@@ -21,12 +21,13 @@ Cartridge::Cartridge(const char* path)
 
 	std::ifstream file;
 	file.open(path, std::ifstream::binary);
+	file.seekg(0, std::ios::end);
+	size_t file_size_in_byte = file.tellg();
+	char* data = new char[file_size_in_byte];
 	file.seekg(0, std::ios::beg);
-
-	std::stringstream buffer;
-	buffer << file.rdbuf();
-	auto hash = SaveManager::getInstance().getHash(strdup(buffer.str().c_str()));
-	logger.log("Rom hash:", hash);
+	file.read(&data[0], file_size_in_byte);
+	hash = SaveManager::getInstance().getHash(data, file_size_in_byte);
+	logger.log("Rom hash: ", hash);
 
 	file.seekg(0, std::ios::beg);
 	if (file.is_open())

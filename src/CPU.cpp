@@ -12,6 +12,12 @@ void CPU::setBus(Bus* bus) {
 	this->bus = bus;
 }
 
+Save::CPUstate CPU::getState() {
+    return Save::CPUstate{
+        x, y, a, sp, status, pc, address, cycles
+    };
+}
+
 void CPU::write(uint16_t address, uint8_t data)
 {
 	bus->write(address, data);

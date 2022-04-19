@@ -3,6 +3,7 @@
 #include "Cartridge.h"
 #include "Color.h"
 #include <cstring>
+#include "Save.h"
 
 class PPU
 {
@@ -17,6 +18,8 @@ public:
 
 	Color palScreen[0x40];
 
+	Save::PPUstate getState();
+
 public:
 	void loadCartridge(Cartridge* cartridge);
 	void clock();
@@ -26,28 +29,20 @@ public:
 	PPU();
 
 	uint8_t* dat = new uint8_t[256 * 240 * 3];
-
 	
-	struct Sprite
-	{
-		uint8_t y;
-		uint8_t id;
-		uint8_t attribute;
-		uint8_t x;
-	} OAM[64];
+	Save::Sprite OAM[64];
 
 private:
 	void processForeground();
 
 	void renderForeground();
 
-	Color prev;
 
-	uint8_t     tblName[2][1024];
-	uint8_t     tblPattern[2][4096];
-	uint8_t		tblPalette[32];
+	uint8_t tblName[2][1024];
+	uint8_t tblPattern[2][4096];
+	uint8_t tblPalette[32];
 
-	Sprite spriteScanline[8];
+	Save::Sprite spriteScanline[8];
 	uint8_t spriteCount;
 	uint8_t sprite_shifter_pattern_lo[8];
 	uint8_t sprite_shifter_pattern_hi[8];

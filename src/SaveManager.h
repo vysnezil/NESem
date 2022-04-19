@@ -4,22 +4,37 @@
 #include <string>
 #include <sstream>
 
+#include "BUS.h"
+#include <filesystem>
+#include <iostream>
+#include <fstream>
+
+#include "json.hpp"
+
 extern "C" {
-#include "md5.h"
+	#include "md5.h"
 }
 
 class SaveManager
 {
 public:
-	void save(Save save) {
+	Save* save(Bus* bus);
 
-	}
+	std::string hash;
 
-	Save* getSavesByRom(char* hash) {
+	void writeToFile(Save* save);
 
-	}
+	std::vector<std::string>* getSavesByRom(char* hash);
 
-	const char* getHash(const char* path);
+	json saveToJson(Save* save);
+
+	Save* getFromJson(json json);
+
+	json readFile(std::string hash, std::string name);
+
+	void loadSave(std::string name);
+
+	const char* getHash(char* cart, size_t size);
 
 	static SaveManager& getInstance() {
 		static SaveManager instance;

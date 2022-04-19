@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "Logger.h"
+#include "Save.h"
 
 class Bus;
 class CPU
@@ -32,6 +33,8 @@ public:
     void NMI();
     //DEBUG
     void jump(uint16_t address);
+
+    Save::CPUstate getState();
 
 private:
     //Internal registers

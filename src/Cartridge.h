@@ -30,5 +30,6 @@ public:
 	bool ppuWrite(uint16_t addr, uint8_t data);
 
 	bool success;
+	const char* hash;
 };
 

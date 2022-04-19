@@ -22,3 +22,8 @@ target_link_libraries(NESem imgui)
 
 add_subdirectory(lib/md5)
 target_link_libraries(NESem md5)
+
+add_subdirectory(lib/json)
+target_link_libraries(NESem json)
+
+target_compile_features(NESem PRIVATE cxx_std_17)

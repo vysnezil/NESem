@@ -1,15 +1,24 @@
 #include "Input.h"
+#include "SaveManager.h"
 
 uint8_t Input::controller = 0;
 bool Input::singleStep = false;
 bool Input::step = false;
 bool Input::stepFrame = false;
+bool Input::saveFlag = false;
+bool Input::menuFlag = true;
 
 void Input::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS) {
         switch (key)
         {
+        case GLFW_KEY_F8:
+            saveFlag = true;
+            break;
+        case GLFW_KEY_ESCAPE:
+            menuFlag = true;
+            break;
         case GLFW_KEY_D:
             step = true;
             Logger::getInstance().log("Input: STEPPED");

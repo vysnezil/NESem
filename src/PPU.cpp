@@ -7,6 +7,16 @@ void PPU::loadCartridge(Cartridge* cartridge)
 	cart = cartridge;
 }
 
+Save::PPUstate PPU::getState() {
+	Save::PPUstate state = {
+		dat, *OAM,
+		**tblName, **tblPattern, *tblPalette,
+		status.reg, mask.reg, control.reg,
+		(uint16_t)vram_addr.reg, (uint16_t)tram_addr.reg,
+		fine_x
+	};
+	return state;
+}
 
 void PPU::reset()
 {
@@ -594,7 +604,7 @@ void PPU::clock()
 void PPU::processForeground() {
 	if (cycle == 257 && scanline >= 0)
 	{
-		std::memset(spriteScanline, 0xFF, 8 * sizeof(Sprite));
+		std::memset(spriteScanline, 0xFF, 8 * sizeof(Save::Sprite));
 		spriteCount = 0;
 		for (uint8_t i = 0; i < 8; i++)
 		{
@@ -612,7 +622,7 @@ void PPU::processForeground() {
 				if (OAMEntry == 0) spriteZeroHitPossible = true;
 				if (spriteCount < 8)
 				{
-					memcpy(&spriteScanline[spriteCount], &OAM[OAMEntry], sizeof(Sprite));
+					memcpy(&spriteScanline[spriteCount], &OAM[OAMEntry], sizeof(Save::Sprite));
 					spriteCount++;
 				}
 			}
