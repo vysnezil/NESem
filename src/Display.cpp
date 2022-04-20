@@ -32,7 +32,7 @@ void Display::update(uint8_t* displayData1) {
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-    setWindowFPS(window);
+    //setWindowFPS(window);
 }
 
 void Display::setWindowFPS(GLFWwindow* win)

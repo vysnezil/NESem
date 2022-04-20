@@ -74,10 +74,14 @@ void Menu::update()
     ImGui::PopStyleColor(3);
 
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowSize(ImVec2(265, 85));
     if (ImGui::BeginPopupModal("Rename", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings))
     {
         static char newName[128] = "";
+        ImGui::PushItemWidth(-1);
         ImGui::InputText("newname", newName, IM_ARRAYSIZE(newName));
+        ImGui::PopItemWidth();
+        ImGui::Dummy(ImVec2(1, 2));
         if (ImGui::Button("OK", ImVec2(120, 0))) {
             ImGui::CloseCurrentPopup();
             if ((newName != NULL) && (newName[0] != '\0')) {
@@ -107,7 +111,7 @@ void Menu::update()
     if (ImGui::Button("select rom", ImVec2(128, 45))) {
         char* file = Dialog::getFile();
         if ((file != NULL) && (file[0] != '\0')) {
-            card = new Cartridge(file);
+            this->card = new Cartridge(file);
             saves = SaveManager::getInstance().getSavesByRom((char*)card->hash);
             selected = 0;
         }

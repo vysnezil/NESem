@@ -19,7 +19,7 @@ Save::PPUstate PPU::getState() {
 }
 
 void PPU::loadState(Save::PPUstate state) {
-	this->reset();
+	//this->reset();
 	/*memcpy(OAM, state.OAM, 64 * sizeof(Save::Sprite));
 	memcpy(tblName, state.tblName, 2*1024);
 	memcpy(tblPattern, state.tblPattern, 2*4096);

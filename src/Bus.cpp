@@ -2,11 +2,12 @@
 
 Bus::Bus()
 {
-	cpu.setBus(this);
+	
 }
 
 void Bus::loadCartridge(Cartridge* cart)
 {
+	cpu.setBus(this);
 	this->cart = cart;
 	ppu.loadCartridge(cart);
 }
