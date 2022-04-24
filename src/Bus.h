@@ -10,7 +10,7 @@ public:
 	CPU cpu;
 	PPU ppu;
 	Cartridge* cart = nullptr;
-	uint8_t ram[2048];
+	uint8_t ram[2048] = { 0 };
 
 	uint8_t controller_state[2];
 	uint8_t* controller[2];

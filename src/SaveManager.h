@@ -26,7 +26,13 @@ public:
 
 	std::vector<std::string>* getSavesByRom(char* hash);
 
+	std::string toString(uint8_t* val, int size);
+
 	json saveToJson(Save* save);
+
+	json getSpriteList(Save::Sprite* value);
+
+	uint8_t* getArray(std::string value, int size);
 
 	Save* getFromJson(json json);
 

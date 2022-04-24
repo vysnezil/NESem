@@ -59,13 +59,16 @@ std::vector<std::string>* SaveManager::getSavesByRom(char* hash) {
 	return saves;
 }
 
+std::string SaveManager::toString(uint8_t* val, int size) {
+	std::ostringstream value;
+	for (size_t i = 0; i < size; i++) value << std::setfill('0') << std::setw(2) << std::right << std::hex << +val[i];
+	return value.str();
+}
+
 json SaveManager::saveToJson(Save* save) {
-	std::ostringstream ram;
-	ram << std::hex;
-	for (size_t i = 0; i < 2048; i++) ram << std::to_string(save->ram[i]);
 	return {
 		{"name", save->name},
-		{"ram", ram.str()},
+		{"ram", toString(save->ram, 2048)},
 		{"cpuState", {
 			{"x", save->cpu_state.x},
 			{"y", save->cpu_state.y},
@@ -83,20 +86,52 @@ json SaveManager::saveToJson(Save* save) {
 			{"vram", save->ppu_state.vram_addr},
 			{"tram", save->ppu_state.tram_addr},
 			{"fine_x", save->ppu_state.fine_x},
+			{"tbl_pallete", toString(save->ppu_state.tblPalette, 32)},
+			{"tbl_name",
+				{
+					{"0", toString(save->ppu_state.tblName[0], 1024)},
+					{"1", toString(save->ppu_state.tblName[1], 1024)}
+				}
+			},
+			{"tbl_pattern",
+				{
+					{"0", toString(save->ppu_state.tblPattern[0], 4096)},
+					{"1", toString(save->ppu_state.tblPattern[1], 4096)}
+				}
+			},
+			{"oam",	getSpriteList(save->ppu_state.OAM)}
 		}},
 		{"clocks", save->system_clocks},
 		{"hash", save->romHash}
 	};
 }
 
+json SaveManager::getSpriteList(Save::Sprite* value) {
+	std::vector<json> vec;
+	for (int i = 0; i < 64; i++)
+	{
+		vec.push_back({
+			{"y", value[i].y},
+			{"id", value[i].id},
+			{"attribute", value[i].attribute},
+			{"x", value[i].x}});
+	}
+	return vec;
+}
+
+uint8_t* SaveManager::getArray(std::string value, int size) {
+	uint8_t* val = new uint8_t[size];
+	for (size_t i = 0; i < size*2; i += 2)
+	{
+		auto c = std::string(1, value[i]) + value[i + 1];
+		uint8_t num = std::stoul(c, nullptr, 16);
+		val[i / 2] = num;
+	}
+	return val;
+}
+
 Save* SaveManager::getFromJson(json json) {
 	Save* save = new Save();
-	std::string ramS = json["ram"];
-	uint8_t ram[2048];
-	for (size_t i = 0; i < 2048; i++)
-	{
-		ram[i] = '0' + ramS[i];
-	}
 	save->name = json["name"];
 	save->cpu_state.x = json["cpuState"]["x"];
 	save->cpu_state.y = json["cpuState"]["y"];
@@ -114,7 +149,25 @@ Save* SaveManager::getFromJson(json json) {
 	save->ppu_state.fine_x = json["ppuState"]["fine_x"];
 	save->system_clocks = json["clocks"];
 	save->romHash = json["hash"];
-	save->ram = ram;
+	save->ram = getArray(json["ram"], 2048);
+
+	//std::copy(&save->ppu_state.tblPalette[0], &save->ppu_state.tblPalette[0] + 32, &getArray(json["ppuState"]["tbl_pallete"], 32)[0]);
+	//std::copy(&save->ppu_state.tblPattern[0][0], &save->ppu_state.tblPattern[1][0] + 4096, &getArray(json["ppuState"]["tbl_pattern"]["0"], 4096)[0]);
+	//std::copy(&save->ppu_state.tblPattern[1][0], &save->ppu_state.tblPattern[1][0] + 4096, &getArray(json["ppuState"]["tbl_pattern"]["1"], 4096)[0]);
+	//std::copy(&save->ppu_state.tblName[0][0], &(save->ppu_state.tblName[0])[0] + 1024, &getArray(json["ppuState"]["tbl_name"]["0"], 1024)[0]);
+	//std::copy(&save->ppu_state.tblName[1][0], &(save->ppu_state.tblName[1])[0] + 1024, &getArray(json["ppuState"]["tbl_name"]["1"], 1024)[0]);
+
+	memcpy(save->ppu_state.tblName[0], getArray(json["ppuState"]["tbl_name"]["0"], 1024), 1024);
+	memcpy(save->ppu_state.tblName[1], getArray(json["ppuState"]["tbl_name"]["1"], 1024), 1024);
+	memcpy(save->ppu_state.tblPattern[0], getArray(json["ppuState"]["tbl_pattern"]["0"], 4096), 4096);
+	memcpy(save->ppu_state.tblPattern[1], getArray(json["ppuState"]["tbl_pattern"]["1"], 4096), 4096);
+	memcpy(save->ppu_state.tblPalette, getArray(json["ppuState"]["tbl_pallete"], 32), 32);
+
+	//save->ppu_state.tblPalette = getArray(json["tbl_pallete"], 32);
+	//save->ppu_state.tblPattern[0] = getArray(json["tbl_pattern"][0], 4096);
+	//save->ppu_state.tblPattern[1] = getArray(json["tbl_pattern"][1], 4096);
+	//save->ppu_state.tblName[0] = getArray(json["tbl_name"][0], 1024);
+	//save->ppu_state.tblName[1] = getArray(json["tbl_name"][1], 1024);
 	return save;
 }
 
@@ -141,7 +194,7 @@ void SaveManager::loadSave(std::string name)
 	memcpy(bus->ram, save->ram, 2048);
 	bus->system_clocks = save->system_clocks;
 	bus->cpu.loadState(save->cpu_state);
-	bus->ppu.loadState(save->ppu_state);
+	bus->ppu.loadState(&save->ppu_state);
 }
 
 void SaveManager::renameSave(std::string name, std::string newName) {

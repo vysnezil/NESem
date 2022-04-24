@@ -20,7 +20,7 @@ public:
 
 	Save::PPUstate getState();
 
-	void loadState(Save::PPUstate state);
+	void loadState(Save::PPUstate* state);
 
 public:
 	void loadCartridge(Cartridge* cartridge);
@@ -59,7 +59,7 @@ private:
 			uint8_t vertical_blank : 1;
 		};
 
-		uint8_t reg;
+		uint8_t reg = 0;
 	} status;
 
 
@@ -77,7 +77,7 @@ private:
 			uint8_t enhance_blue : 1;
 		};
 
-		uint8_t reg;
+		uint8_t reg = 0;
 	} mask;
 
 	union PPUCTRL
@@ -94,7 +94,7 @@ private:
 			uint8_t enable_nmi : 1;
 		};
 
-		uint8_t reg;
+		uint8_t reg = 0;
 	} control;
 
 	union loopy_register

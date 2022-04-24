@@ -28,9 +28,10 @@ struct Save {
         uint8_t fine_x;
         uint8_t* screen;
         Sprite OAM[64];
+
+        uint8_t tblPalette[32];
         uint8_t tblName[2][1024];
         uint8_t tblPattern[2][4096];
-        uint8_t tblPalette[32];
     } ppu_state;
 
     uint8_t* ram;
