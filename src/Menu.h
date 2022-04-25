@@ -12,5 +12,5 @@ public:
 	std::vector<std::string>* saves = new std::vector<std::string>();
 	std::string selectedSave;
 	bool show = true;
-	Cartridge* card = nullptr;
+	std::shared_ptr<Cartridge> card = nullptr;
 };

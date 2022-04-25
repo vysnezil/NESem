@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "SaveManager.h"
 
 uint8_t Input::controller = 0;
 bool Input::singleStep = false;
@@ -6,6 +7,7 @@ bool Input::step = false;
 bool Input::stepFrame = false;
 bool Input::saveFlag = false;
 bool Input::menuFlag = false;
+bool Input::loadFlag = false;
 
 int Input::recordKey = 0;
 
@@ -37,6 +39,9 @@ void Input::key_callback(GLFWwindow* window, int key, int scancode, int action, 
         {
         case GLFW_KEY_F8:
             saveFlag = true;
+            break;
+        case GLFW_KEY_F5:
+            loadFlag = true;
             break;
         case GLFW_KEY_ESCAPE:
             menuFlag = true;

@@ -12,24 +12,23 @@ Save::PPUstate PPU::getState() {
 		status.reg, mask.reg, control.reg,
 		(uint16_t)vram_addr.reg, (uint16_t)tram_addr.reg,
 		fine_x,
-		dat, *OAM
+		dat
 	};
 	std::copy(&tblPalette[0], &tblPalette[0] + 32, &state.tblPalette[0]);
+	memcpy(state.OAM, OAM, 64 * sizeof(Save::Sprite));
 	std::copy(&tblPattern[0][0], &tblPattern[0][0] + 2 * 4096, &state.tblPattern[0][0]);
 	std::copy(&tblName[0][0], &tblName[0][0] + 2 * 1024, &state.tblName[0][0]);
 	return state;
 }
 
 void PPU::loadState(Save::PPUstate* state) {
-	//this->reset();
-	//memcpy(OAM, state->OAM, 64 * sizeof(Save::Sprite));
+	this->reset();
+	memcpy(OAM, state->OAM, 64 * sizeof(Save::Sprite));
 	memcpy(tblName, state->tblName, 2 * 1024);
 	memcpy(tblPattern, state->tblPattern, 2 * 4096);
 	memcpy(tblPalette, state->tblPalette, 32);
 	status.reg = state->status;
-
 	mask.reg = state->mask;
-
 	control.reg = state->control;
 	vram_addr.reg = state->vram_addr;
 	tram_addr.reg = state->tram_addr;

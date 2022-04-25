@@ -70,7 +70,7 @@ Cartridge::Cartridge(const char* path)
 		switch (mapperID)
 		{
 		case 0:
-			mapper = new Mapper000(PRGBankCount, CHRBankCount);
+			mapper = std::make_shared<Mapper000>(PRGBankCount, CHRBankCount);
 			break;
 		default:
 			logger.log("CARTRIDGE: Mapper ", std::to_string(mapperID), " not supported!");

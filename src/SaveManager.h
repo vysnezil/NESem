@@ -9,6 +9,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <algorithm>
+#include <cctype>
+
 #include "json.hpp"
 
 extern "C" {
@@ -23,6 +26,10 @@ public:
 	std::string hash;
 	Bus* bus;
 	void writeToFile(Save* save);
+
+	static bool compareNat(const std::string& a, const std::string& b);
+
+	static std::string toUpper(std::string s);
 
 	std::vector<std::string>* getSavesByRom(char* hash);
 

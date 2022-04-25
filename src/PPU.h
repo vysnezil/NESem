@@ -27,12 +27,12 @@ public:
 	void clock();
 	void reset();
 	bool nmi = false;
-	bool finished;
+	bool finished = false;
 	PPU();
 
 	uint8_t* dat = new uint8_t[256 * 240 * 3];
 	
-	Save::Sprite OAM[64];
+	Save::Sprite OAM[64] = { 0 };
 
 private:
 	void processForeground();
@@ -45,7 +45,7 @@ private:
 	uint8_t tblPalette[32];
 
 	Save::Sprite spriteScanline[8];
-	uint8_t spriteCount;
+	uint8_t spriteCount = 0;
 	uint8_t sprite_shifter_pattern_lo[8];
 	uint8_t sprite_shifter_pattern_hi[8];
 

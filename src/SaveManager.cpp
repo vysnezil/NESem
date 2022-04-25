@@ -48,6 +48,41 @@ void SaveManager::writeToFile(Save* save) {
 	outfile.close();
 }
 
+//https://stackoverflow.com/a/33495791
+bool SaveManager::compareNat(const std::string& a, const std::string& b) {
+	if (a.empty())
+		return true;
+	if (b.empty())
+		return false;
+	if (std::isdigit(a[0]) && !std::isdigit(b[0]))
+		return true;
+	if (!std::isdigit(a[0]) && std::isdigit(b[0]))
+		return false;
+	if (!std::isdigit(a[0]) && !std::isdigit(b[0]))
+	{
+		if (a[0] == b[0])
+			return compareNat(a.substr(1), b.substr(1));
+		return (toUpper(a) < toUpper(b));
+	}
+	std::istringstream issa(a);
+	std::istringstream issb(b);
+	int ia, ib;
+	issa >> ia;
+	issb >> ib;
+	if (ia != ib)
+		return ia < ib;
+
+	std::string anew, bnew;
+	std::getline(issa, anew);
+	std::getline(issb, bnew);
+	return (compareNat(anew, bnew));
+}
+
+std::string SaveManager::toUpper(std::string s) {
+	for (int i = 0; i < (int)s.length(); i++) { s[i] = toupper(s[i]); }
+	return s;
+}
+
 std::vector<std::string>* SaveManager::getSavesByRom(char* hash) {
 	this->hash = hash;
 	std::vector<std::string>* saves = new std::vector<std::string>();
@@ -56,6 +91,8 @@ std::vector<std::string>* SaveManager::getSavesByRom(char* hash) {
 		for (const auto& entry : std::filesystem::directory_iterator(path))
 			saves->push_back(entry.path().filename().replace_extension().string());
 	}
+	std::sort(saves->begin(), saves->end(), compareNat);
+
 	return saves;
 }
 
@@ -151,23 +188,24 @@ Save* SaveManager::getFromJson(json json) {
 	save->romHash = json["hash"];
 	save->ram = getArray(json["ram"], 2048);
 
-	//std::copy(&save->ppu_state.tblPalette[0], &save->ppu_state.tblPalette[0] + 32, &getArray(json["ppuState"]["tbl_pallete"], 32)[0]);
-	//std::copy(&save->ppu_state.tblPattern[0][0], &save->ppu_state.tblPattern[1][0] + 4096, &getArray(json["ppuState"]["tbl_pattern"]["0"], 4096)[0]);
-	//std::copy(&save->ppu_state.tblPattern[1][0], &save->ppu_state.tblPattern[1][0] + 4096, &getArray(json["ppuState"]["tbl_pattern"]["1"], 4096)[0]);
-	//std::copy(&save->ppu_state.tblName[0][0], &(save->ppu_state.tblName[0])[0] + 1024, &getArray(json["ppuState"]["tbl_name"]["0"], 1024)[0]);
-	//std::copy(&save->ppu_state.tblName[1][0], &(save->ppu_state.tblName[1])[0] + 1024, &getArray(json["ppuState"]["tbl_name"]["1"], 1024)[0]);
-
 	memcpy(save->ppu_state.tblName[0], getArray(json["ppuState"]["tbl_name"]["0"], 1024), 1024);
 	memcpy(save->ppu_state.tblName[1], getArray(json["ppuState"]["tbl_name"]["1"], 1024), 1024);
 	memcpy(save->ppu_state.tblPattern[0], getArray(json["ppuState"]["tbl_pattern"]["0"], 4096), 4096);
 	memcpy(save->ppu_state.tblPattern[1], getArray(json["ppuState"]["tbl_pattern"]["1"], 4096), 4096);
 	memcpy(save->ppu_state.tblPalette, getArray(json["ppuState"]["tbl_pallete"], 32), 32);
 
-	//save->ppu_state.tblPalette = getArray(json["tbl_pallete"], 32);
-	//save->ppu_state.tblPattern[0] = getArray(json["tbl_pattern"][0], 4096);
-	//save->ppu_state.tblPattern[1] = getArray(json["tbl_pattern"][1], 4096);
-	//save->ppu_state.tblName[0] = getArray(json["tbl_name"][0], 1024);
-	//save->ppu_state.tblName[1] = getArray(json["tbl_name"][1], 1024);
+	Save::Sprite arr[64];
+	for (size_t i = 0; i < 64; i++)
+	{
+		auto var = json["ppuState"]["oam"][i];
+		arr[i] = {
+			var["y"],
+			var["id"],
+			var["attribute"],
+			var["x"]
+		};
+	}
+	memcpy(save->ppu_state.OAM, arr, 64 * sizeof(Save::Sprite));
 	return save;
 }
 

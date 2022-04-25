@@ -11,7 +11,7 @@ class Cartridge
 	uint8_t* PRGMemory = nullptr;
 	uint8_t* CHRMemory = nullptr;
 
-	Mapper* mapper = nullptr;
+	std::shared_ptr<Mapper> mapper = nullptr;
 
 public:
 	enum MIRROR

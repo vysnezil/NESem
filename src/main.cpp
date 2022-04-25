@@ -37,9 +37,9 @@ int main(int argc, char** argv) {
 	Input input(glHelper::getInstance().window);
 
 	if (argv[1]){
-		menu.card = new Cartridge(argv[1]);
+		menu.card = std::make_shared<Cartridge>(argv[1]);
 		menu.show = false;
-		bus->loadCartridge(menu.card);
+		bus->loadCartridge(menu.card.get());
 		bus->setInput(&input.controller);
 		bus->reset();
 	}
@@ -85,7 +85,12 @@ int main(int argc, char** argv) {
 		gl.render();
 		if (input.saveFlag) {
 			Save* save = SaveManager::getInstance().save(bus);
+			menu.selectedSave = save->name;
 			input.saveFlag = false;
+		}
+		if (input.loadFlag) {
+			SaveManager::getInstance().loadSave(menu.selectedSave);
+			input.loadFlag = false;
 		}
 	}
 }

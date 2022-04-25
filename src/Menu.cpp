@@ -34,7 +34,7 @@ void Menu::update()
     ImGui::Dummy(ImVec2(0.0f, 3.0f));
     ImGui::BeginDisabled(saves->size() == 0);
     if (ImGui::Button("Load save", ImVec2(128, 45))) {
-        SaveManager::getInstance().bus->loadCartridge(card);
+        SaveManager::getInstance().bus->loadCartridge(card.get());
         SaveManager::getInstance().loadSave(selectedSave);
         show = false;
         glHelper::getInstance().resizeWindow(false);
@@ -111,7 +111,7 @@ void Menu::update()
     if (ImGui::Button("select rom", ImVec2(128, 45))) {
         char* file = Dialog::getFile();
         if ((file != NULL) && (file[0] != '\0')) {
-            this->card = new Cartridge(file);
+            this->card = std::make_shared<Cartridge>(file);
             saves = SaveManager::getInstance().getSavesByRom((char*)card->hash);
             selected = 0;
         }
@@ -120,7 +120,7 @@ void Menu::update()
     else ImGui::BeginDisabled(!card->success);
     ImGui::SameLine();
     if (ImGui::Button("Start", ImVec2(128, 45))) {
-        SaveManager::getInstance().bus->loadCartridge(card);
+        SaveManager::getInstance().bus->loadCartridge(card.get());
         SaveManager::getInstance().bus->reset();
         show = false;
         glHelper::getInstance().resizeWindow(false);
