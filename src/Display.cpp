@@ -23,6 +23,8 @@ void Display::update(uint8_t* displayData1) {
     }
     lasttime += (1.0 / 60);
 
+    Overlay::getInstance().update();
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGB, GL_UNSIGNED_BYTE, displayData1);
     glGenerateMipmap(GL_TEXTURE_2D);
 

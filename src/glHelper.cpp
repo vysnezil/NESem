@@ -60,5 +60,6 @@ void glHelper::setupRender() {
 
 void glHelper::resizeWindow(bool menu)
 {
-    glfwSetWindowSize(window, menu ? 560 : 768, menu ? 295 : 720);
+    glfwSetWindowSizeLimits(window, menu ? 560 : 0, menu ? 295 : 0, menu ? 560 : 0xffff, menu ? 295 : 0xffff);
+    glfwSetWindowSize(window, menu ? 560 : 768, menu ? 295 : 720);  
 }

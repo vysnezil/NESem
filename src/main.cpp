@@ -28,25 +28,26 @@ int main(int argc, char** argv) {
 		exit(1);
 	}*/
 	
-	
-
 	Menu menu;
 	glHelper gl = glHelper::getInstance();
 	
 	Bus* bus = new Bus();
 	Input input(glHelper::getInstance().window);
 
-	if (argv[1]){
+	if (argv[1]) {
 		menu.card = std::make_shared<Cartridge>(argv[1]);
 		menu.show = false;
 		bus->loadCartridge(menu.card.get());
 		bus->setInput(&input.controller);
 		bus->reset();
 	}
+	else (glHelper::getInstance().resizeWindow(true));
 
 	Display display;
+	Overlay::getInstance().init();
 	
 	bus->setInput(&input.controller);
+	input.loadKeys();
 
 	//menu.saves = SaveManager::getInstance().getSavesByRom((char*)menu.card->hash);
 	if (menu.saves->size() > 0) menu.selectedSave = menu.saves->at(0);
@@ -56,6 +57,9 @@ int main(int argc, char** argv) {
 		gl.setupRender();
 		if (menu.show) {
 			menu.update();
+			if (input.saveFlag) input.saveFlag = false;
+			if (input.loadFlag) input.loadFlag = false;
+			if (input.menuFlag) input.menuFlag = false;
 		}
 		else {
 			if (input.menuFlag) {
@@ -81,16 +85,19 @@ int main(int argc, char** argv) {
 				}
 			}
 			display.update(bus->ppu.dat);
+
+			if (input.saveFlag) {
+				Save* save = SaveManager::getInstance().save(bus);
+				menu.selectedSave = save->name;
+				Overlay::getInstance().begin("Save created", 2);
+				input.saveFlag = false;
+			}
+			if (input.loadFlag) {
+				SaveManager::getInstance().loadSave(menu.selectedSave);
+				Overlay::getInstance().begin("Loaded last save", 2);
+				input.loadFlag = false;
+			}
 		}
 		gl.render();
-		if (input.saveFlag) {
-			Save* save = SaveManager::getInstance().save(bus);
-			menu.selectedSave = save->name;
-			input.saveFlag = false;
-		}
-		if (input.loadFlag) {
-			SaveManager::getInstance().loadSave(menu.selectedSave);
-			input.loadFlag = false;
-		}
 	}
 }

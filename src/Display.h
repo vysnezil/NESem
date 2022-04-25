@@ -2,6 +2,7 @@
 #include <cstdint>
 
 #include "glHelper.h"
+#include "Overlay.h"
 
 #include <chrono>
 #include <thread>
@@ -10,6 +11,7 @@ class Display
 {
 public:
 	Display();
+	ImFont* AddDefaultFont(float pixel_size);
 	void update(uint8_t* displayData);
 	void setWindowFPS(GLFWwindow* win);
 	GLFWwindow* window;

@@ -17,5 +17,8 @@ public:
 	static int keys[8];
 	static int recordKey;
 	static char* getArrow(int code);
+
+	static void saveKeys();
+	static void loadKeys();
 };
 
