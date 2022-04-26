@@ -2,6 +2,7 @@
 #include "Mapper/Mapper.h"
 #include <cstdint>
 #include "Logger.h"
+#include <memory>
 
 class Cartridge
 {

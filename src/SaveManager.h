@@ -4,7 +4,7 @@
 #include <string>
 #include <sstream>
 
-#include "BUS.h"
+#include "Bus.h"
 #include <filesystem>
 #include <iostream>
 #include <fstream>
