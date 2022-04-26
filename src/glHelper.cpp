@@ -23,7 +23,7 @@ void glHelper::glInit() {
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 330");
+        ImGui_ImplOpenGL2_Init();
 
         glfwSwapInterval(0); 
         initialized = true;
@@ -32,7 +32,7 @@ void glHelper::glInit() {
 
 void glHelper::render() {
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
@@ -40,7 +40,7 @@ void glHelper::render() {
 bool glHelper::shouldClose() {
     bool close = glfwWindowShouldClose(this->window);
     if (close) {
-        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplOpenGL2_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
 
@@ -53,7 +53,7 @@ bool glHelper::shouldClose() {
 void glHelper::setupRender() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 }
