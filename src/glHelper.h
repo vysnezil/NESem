@@ -26,6 +26,7 @@ public:
 	static void size_callback(GLFWwindow* window, int width, int height);
 	GLFWwindow* window;
 	bool initialized;
+	double lasttime = 0;
 	static glHelper& getInstance() {
 		static glHelper instance;
 		return instance;

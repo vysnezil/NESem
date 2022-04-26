@@ -17,7 +17,6 @@ public:
 
 private:
 	unsigned int setupTexture();
-	double lasttime = 0;
 	double lasttimeCounter = 0;
 	uint16_t frames = 0;
 	unsigned int texture;

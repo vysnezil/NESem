@@ -8,14 +8,14 @@ Display::Display()
     window = glHelper::getInstance().window;
 
     texture = setupTexture();
-    lasttime = glfwGetTime();
+    glHelper::getInstance().lasttime = glfwGetTime();
 }
 
 void Display::update(uint8_t* displayData1) {
-    while (glfwGetTime() < lasttime + (1.0 / 60)) {
+    while (glfwGetTime() < glHelper::getInstance().lasttime + (1.0 / 60)) {
         //wait
     }
-    lasttime += (1.0 / 60);
+    glHelper::getInstance().lasttime += (1.0 / 60);
 
     Overlay::getInstance().update();
 

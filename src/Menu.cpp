@@ -37,6 +37,7 @@ void Menu::update()
         SaveManager::getInstance().bus->loadCartridge(card.get());
         SaveManager::getInstance().loadSave(selectedSave);
         show = false;
+        glHelper::getInstance().lasttime = glfwGetTime();
         glHelper::getInstance().resizeWindow(false);
     }
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -125,6 +126,7 @@ void Menu::update()
         SaveManager::getInstance().bus->loadCartridge(card.get());
         SaveManager::getInstance().bus->reset();
         show = false;
+        glHelper::getInstance().lasttime = glfwGetTime();
         glHelper::getInstance().resizeWindow(false);
     }
     ImGui::EndDisabled();
