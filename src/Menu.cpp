@@ -114,7 +114,7 @@ void Menu::update()
             this->card = std::make_shared<Cartridge>(file);
             saves = SaveManager::getInstance().getSavesByRom((char*)card->hash);
             selected = 0;
-            selectedSave = saves->at(0);
+            if (saves->size() > 0) selectedSave = saves->at(0);
         }
     };
     if (card == nullptr) ImGui::BeginDisabled(true);
