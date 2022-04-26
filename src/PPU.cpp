@@ -128,9 +128,6 @@ void PPU::reset()
 
 }
 
-PPU::PPU()
-{
-}
 
 
 uint8_t PPU::cpuRead(uint16_t addr)
@@ -385,12 +382,12 @@ void PPU::clock()
 
 				break;
 			case 2:
-			
+
 				bg_next_tile_attrib = ppuRead(0x23C0 | (vram_addr.nametable_y << 11)
 					| (vram_addr.nametable_x << 10)
 					| ((vram_addr.coarse_y >> 2) << 3)
 					| (vram_addr.coarse_x >> 2));
-		
+
 				if (vram_addr.coarse_y & 0x02) bg_next_tile_attrib >>= 4;
 				if (vram_addr.coarse_x & 0x02) bg_next_tile_attrib >>= 2;
 				bg_next_tile_attrib &= 0x03;
@@ -484,124 +481,124 @@ void PPU::clock()
 		}
 
 
-	}
-
-	if (cycle == 257 && scanline >= 0)
-	{
-		std::memset(spriteScanline, 0xFF, 8 * sizeof(Save::Sprite));
-		spriteCount = 0;
-		for (uint8_t i = 0; i < 8; i++)
-		{
-			sprite_shifter_pattern_lo[i] = 0;
-			sprite_shifter_pattern_hi[i] = 0;
 		}
 
-		uint8_t OAMEntry = 0;
-		spriteZeroHitPossible = false;
-		while (OAMEntry < 64 && spriteCount < 9)
+		if (cycle == 257 && scanline >= 0)
 		{
-			int16_t diff = ((int16_t)scanline - (int16_t)OAM[OAMEntry].y);
-			if (diff >= 0 && diff < (control.sprite_size ? 16 : 8))
-			{	
-				if (spriteCount < 8)
-				{
-					memcpy(&spriteScanline[spriteCount], &OAM[OAMEntry], sizeof(Save::Sprite));
-					spriteCount++;
-					if (OAMEntry == 0) spriteZeroHitPossible = true;
-				}
+			std::memset(spriteScanline, 0xFF, 8 * sizeof(Save::Sprite));
+			spriteCount = 0;
+			for (uint8_t i = 0; i < 8; i++)
+			{
+				sprite_shifter_pattern_lo[i] = 0;
+				sprite_shifter_pattern_hi[i] = 0;
 			}
 
-			OAMEntry++;
+			uint8_t OAMEntry = 0;
+			spriteZeroHitPossible = false;
+			while (OAMEntry < 64 && spriteCount < 9)
+			{
+				int16_t diff = ((int16_t)scanline - (int16_t)OAM[OAMEntry].y);
+				if (diff >= 0 && diff < (control.sprite_size ? 16 : 8))
+				{
+					if (spriteCount < 8)
+					{
+						memcpy(&spriteScanline[spriteCount], &OAM[OAMEntry], sizeof(Save::Sprite));
+						spriteCount++;
+						if (OAMEntry == 0) spriteZeroHitPossible = true;
+					}
+				}
+
+				OAMEntry++;
+			}
+			status.sprite_overflow = (spriteCount > 8);
 		}
-		status.sprite_overflow = (spriteCount > 8);
-	}
 
-	if (cycle == 340)
-	{
-		for (uint8_t i = 0; i < spriteCount; i++)
+		if (cycle == 340)
 		{
-			uint8_t sprite_pattern_bits_lo, sprite_pattern_bits_hi;
-			uint16_t sprite_pattern_addr_lo, sprite_pattern_addr_hi;
-			if (!control.sprite_size)
+			for (uint8_t i = 0; i < spriteCount; i++)
 			{
-				if (!(spriteScanline[i].attribute & 0x80))
+				uint8_t sprite_pattern_bits_lo, sprite_pattern_bits_hi;
+				uint16_t sprite_pattern_addr_lo, sprite_pattern_addr_hi;
+				if (!control.sprite_size)
 				{
-					sprite_pattern_addr_lo =
-						(control.pattern_sprite << 12)
-						| (spriteScanline[i].id << 4)
-						| (scanline - spriteScanline[i].y);
-
-				}
-				else
-				{
-					sprite_pattern_addr_lo =
-						(control.pattern_sprite << 12)
-						| (spriteScanline[i].id << 4)
-						| (7 - (scanline - spriteScanline[i].y));
-				}
-
-			}
-			else
-			{
-				if (!(spriteScanline[i].attribute & 0x80))
-				{
-					if (scanline - spriteScanline[i].y < 8)
+					if (!(spriteScanline[i].attribute & 0x80))
 					{
 						sprite_pattern_addr_lo =
-							((spriteScanline[i].id & 0x01) << 12)
-							| ((spriteScanline[i].id & 0xFE) << 4)
-							| ((scanline - spriteScanline[i].y) & 0x07);
+							(control.pattern_sprite << 12)
+							| (spriteScanline[i].id << 4)
+							| (scanline - spriteScanline[i].y);
+
 					}
 					else
 					{
 						sprite_pattern_addr_lo =
-							((spriteScanline[i].id & 0x01) << 12)
-							| (((spriteScanline[i].id & 0xFE) + 1) << 4)
-							| ((scanline - spriteScanline[i].y) & 0x07);
+							(control.pattern_sprite << 12)
+							| (spriteScanline[i].id << 4)
+							| (7 - (scanline - spriteScanline[i].y));
 					}
+
 				}
 				else
 				{
-					if (scanline - spriteScanline[i].y < 8)
+					if (!(spriteScanline[i].attribute & 0x80))
 					{
-						sprite_pattern_addr_lo =
-							((spriteScanline[i].id & 0x01) << 12)
-							| (((spriteScanline[i].id & 0xFE) + 1) << 4)
-							| (7 - (scanline - spriteScanline[i].y) & 0x07);
+						if (scanline - spriteScanline[i].y < 8)
+						{
+							sprite_pattern_addr_lo =
+								((spriteScanline[i].id & 0x01) << 12)
+								| ((spriteScanline[i].id & 0xFE) << 4)
+								| ((scanline - spriteScanline[i].y) & 0x07);
+						}
+						else
+						{
+							sprite_pattern_addr_lo =
+								((spriteScanline[i].id & 0x01) << 12)
+								| (((spriteScanline[i].id & 0xFE) + 1) << 4)
+								| ((scanline - spriteScanline[i].y) & 0x07);
+						}
 					}
 					else
 					{
-						sprite_pattern_addr_lo =
-							((spriteScanline[i].id & 0x01) << 12)
-							| ((spriteScanline[i].id & 0xFE) << 4)
-							| (7 - (scanline - spriteScanline[i].y) & 0x07);
+						if (scanline - spriteScanline[i].y < 8)
+						{
+							sprite_pattern_addr_lo =
+								((spriteScanline[i].id & 0x01) << 12)
+								| (((spriteScanline[i].id & 0xFE) + 1) << 4)
+								| (7 - (scanline - spriteScanline[i].y) & 0x07);
+						}
+						else
+						{
+							sprite_pattern_addr_lo =
+								((spriteScanline[i].id & 0x01) << 12)
+								| ((spriteScanline[i].id & 0xFE) << 4)
+								| (7 - (scanline - spriteScanline[i].y) & 0x07);
+						}
 					}
 				}
-			}
 
-			sprite_pattern_addr_hi = sprite_pattern_addr_lo + 8;
+				sprite_pattern_addr_hi = sprite_pattern_addr_lo + 8;
 
-			sprite_pattern_bits_lo = ppuRead(sprite_pattern_addr_lo);
-			sprite_pattern_bits_hi = ppuRead(sprite_pattern_addr_hi);
+				sprite_pattern_bits_lo = ppuRead(sprite_pattern_addr_lo);
+				sprite_pattern_bits_hi = ppuRead(sprite_pattern_addr_hi);
 
-			if (spriteScanline[i].attribute & 0x40)
-			{
-				auto flipbyte = [](uint8_t b)
+				if (spriteScanline[i].attribute & 0x40)
 				{
-					b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-					b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-					b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-					return b;
-				};
+					auto flipbyte = [](uint8_t b)
+					{
+						b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+						b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+						b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+						return b;
+					};
 
-				sprite_pattern_bits_lo = flipbyte(sprite_pattern_bits_lo);
-				sprite_pattern_bits_hi = flipbyte(sprite_pattern_bits_hi);
+					sprite_pattern_bits_lo = flipbyte(sprite_pattern_bits_lo);
+					sprite_pattern_bits_hi = flipbyte(sprite_pattern_bits_hi);
+				}
+
+				sprite_shifter_pattern_lo[i] = sprite_pattern_bits_lo;
+				sprite_shifter_pattern_hi[i] = sprite_pattern_bits_hi;
 			}
-
-			sprite_shifter_pattern_lo[i] = sprite_pattern_bits_lo;
-			sprite_shifter_pattern_hi[i] = sprite_pattern_bits_hi;
 		}
-	}
 
 	if (scanline >= 241 && scanline < 261)
 	{
@@ -628,6 +625,9 @@ void PPU::clock()
 
 	}
 
+	uint8_t fg_pixel = 0x00;
+	uint8_t fg_palette = 0x00;
+	uint8_t fg_priority = 0x00;
 	if (mask.render_sprites)
 	{
 		spriteZeroBeingRendered = false;
@@ -705,43 +705,18 @@ void PPU::clock()
 		}
 	}
 
-	//Logger::logHex(palScreen[ppuRead(0x3F00 + (bg_palette << 2) + bg_pixel) & 0x3F]);
 
-	//if (scanline == 0xC0) Input::singleStep = true;
 
 	Color color = palScreen[ppuRead(0x3F00 + (palette << 2) + pixel) & 0x3F];
 	if (scanline >= 0 && scanline < 240 && cycle <= 256) {
-		
+
 		int index = (scanline * 256 + cycle - 1) * 3;
 		dat[index + 0] = color.r;
 		dat[index + 1] = color.g;
 		dat[index + 2] = color.b;
-
-		/*if (true) {
-			int index = (scanline * 256 + cycle - 1) * 3;
-			dat[index + 0] = 255;
-			dat[index + 1] = 0;
-			dat[index + 2] = 0;
-		}*/
-
-		//prev = color;
-		/*
-		for (uint8_t i = 0; i < spriteCount; i++)
-		{
-			if (cycle == OAM[i].x) {
-				dat[index + 0] = 255;
-				dat[index + 1] = 0;
-				dat[index + 2] = 0;
-			}
-		if (scanline == OAM[i].y) {
-			dat[index + 0] = 255;
-			dat[index + 1] = 0;
-			dat[index + 2] = 0;
-		}
-		}*/
 	}
 
-	
+
 
 	cycle++;
 	if (cycle >= 341)
@@ -751,16 +726,7 @@ void PPU::clock()
 		if (scanline >= 261)
 		{
 			scanline = -1;
-			//Logger::log(frames);
 			finished = true;
 		}
 	}
-}
-
-void PPU::processForeground() {
-	
-}
-
-void PPU::renderForeground() {
-	
 }

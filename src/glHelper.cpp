@@ -13,6 +13,11 @@ void glHelper::glInit() {
     if (!initialized) {
         if (!glfwInit()) Logger::getInstance().log("Failed to initialize GLFW!");
         window = glfwCreateWindow(280*2, 295, "NESem", NULL, NULL);
+        GLFWmonitor* primary = glfwGetPrimaryMonitor();
+        if (primary) {
+            const GLFWvidmode* desktop = glfwGetVideoMode(primary);
+            if (desktop) glfwSetWindowPos(window, (desktop->width / 2) -280, (desktop->height/2) - (295/2));
+        }
         glfwMakeContextCurrent(window);
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) Logger::getInstance().log("Failed to initialize GLAD!");
         glfwSetErrorCallback(this->error_callback);

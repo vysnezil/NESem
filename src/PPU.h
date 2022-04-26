@@ -28,18 +28,13 @@ public:
 	void reset();
 	bool nmi = false;
 	bool finished = false;
-	PPU();
+	PPU() {};
 
 	uint8_t* dat = new uint8_t[256 * 240 * 3];
 	
 	Save::Sprite OAM[64] = { 0 };
 
 private:
-	void processForeground();
-
-	void renderForeground();
-
-
 	uint8_t tblName[2][1024];
 	uint8_t tblPattern[2][4096];
 	uint8_t tblPalette[32];
@@ -136,10 +131,6 @@ private:
 	
 
 	uint8_t oam_addr = 0x00;
-
-	uint8_t fg_pixel = 0x00;
-	uint8_t fg_palette = 0x00;
-	uint8_t fg_priority = 0x00;
 
 	bool spriteZeroHitPossible = false;
 	bool spriteZeroBeingRendered = false;

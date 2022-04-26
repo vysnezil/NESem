@@ -49,6 +49,7 @@ void Menu::update()
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(7.0f, 0.8f, 0.8f));
         if (ImGui::Button("Yes", ImVec2(120, 0))) {
             ImGui::CloseCurrentPopup();
+            selectedSave = "";
             saves->erase(saves->begin() + selected);
             Logger::getInstance().log("saves/" + (std::string)card->hash + "/" + selectedSave);
             std::filesystem::remove("saves/" + (std::string)card->hash + "/" + selectedSave + ".json");

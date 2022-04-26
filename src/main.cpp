@@ -93,8 +93,10 @@ int main(int argc, char** argv) {
 				input.saveFlag = false;
 			}
 			if (input.loadFlag) {
-				SaveManager::getInstance().loadSave(menu.selectedSave);
-				Overlay::getInstance().begin("Loaded last save", 2);
+				if (menu.selectedSave != "") {
+					SaveManager::getInstance().loadSave(menu.selectedSave);
+					Overlay::getInstance().begin("Loaded last save", 2);
+				}
 				input.loadFlag = false;
 			}
 		}
