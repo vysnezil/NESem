@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 project(NESem)
-#set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release")
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -9,9 +9,6 @@ add_executable(NESem src/main.cpp src/Display.cpp src/Input.cpp src/Bus.cpp src/
 
 #add_subdirectory(lib/glfw-3.3.6)
 #target_link_libraries(NESem glfw)
-
-find_package(OpenGL REQUIRED)
-target_link_libraries(NESem OpenGL::GL)
 
 add_subdirectory(lib/glad)
 target_link_libraries(NESem glad)

@@ -6,5 +6,8 @@ add_library(imgui include/imgui.h include/imconfig.h include/imgui_impl_glfw.h i
 
 target_include_directories(imgui PUBLIC include/)
 
+find_package(OpenGL REQUIRED)
+target_link_libraries(imgui OpenGL::GL)
+
 add_subdirectory(../glfw-3.3.6 ../sub)
 target_link_libraries(imgui glfw)
