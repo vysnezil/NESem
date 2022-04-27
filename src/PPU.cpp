@@ -317,9 +317,6 @@ void PPU::ppuWrite(uint16_t addr, uint8_t data)
 
 void PPU::clock()
 {
-	//sprScreen.SetPixel(cycle - 1, scanline, palScreen[(rand() % 2) ? 0x3F : 0x30]);
-	
-
 	if (scanline >= -1 && scanline < 240)
 	{
 		if (cycle == 0)

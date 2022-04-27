@@ -37,6 +37,7 @@ int main(int argc, char** argv) {
 	if (argv[1]) {
 		menu.card = std::make_shared<Cartridge>(argv[1]);
 		menu.show = false;
+		glHelper::getInstance().resizeWindow(false);
 		bus->loadCartridge(menu.card.get());
 		bus->setInput(&input.controller);
 		bus->reset();
