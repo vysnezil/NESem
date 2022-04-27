@@ -29,6 +29,7 @@ void glHelper::glInit() {
         ImGui::StyleColorsDark();
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL2_Init();
+        io.IniFilename = NULL;
 
         glfwSwapInterval(0); 
         initialized = true;
